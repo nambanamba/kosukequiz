@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>女子力検定</title>
+<style>
+  :root{
+    --paper:#f8f0f4;
+    --paper-line:#eaddE4;
+    --ink:#332430;
+    --ink-soft:#8a7683;
+    --pink:#b2447a;
+    --pink-deep:#8c3260;
+    --gold:#c98fae;
+    --ok:#3f7d5c;
+    --ok-bg:#e4efe6;
+    --ng:#b5533f;
+    --ng-bg:#f6e6e1;
+    --card-shadow: 0 10px 30px rgba(140,50,96,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      linear-gradient(var(--paper-line) 1px, transparent 1px) 0 0/100% 34px,
+      var(--paper);
+    color:var(--ink);
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:520px;
+    margin:0 auto;
+    padding:18px 16px 40px;
+    min-height:100vh;
+  }
+  header.top{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:18px;
+    padding-bottom:12px;
+    border-bottom:2px solid var(--pink);
+  }
+  header.top .brand{
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    font-size:20px;
+    font-weight:700;
+    color:var(--pink-deep);
+    letter-spacing:.02em;
+  }
+  header.top .brand small{
+    display:block;
+    font-family: sans-serif;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:400;
+    letter-spacing:.08em;
+    margin-top:2px;
+  }
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  .stat-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .stat-card{
+    flex:1;
+    background:#fff;
+    border:1px solid var(--paper-line);
+    border-radius:10px;
+    padding:12px 10px;
+    text-align:center;
+    box-shadow:var(--card-shadow);
+  }
+  .stat-card .num{
+    font-family:"Hiragino Mincho ProN", serif;
+    font-size:26px;
+    font-weight:700;
+    color:var(--pink-deep);
+    line-height:1.1;
+  }
+  .stat-card .lbl{
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+
+  .section-title{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    letter-spacing:.08em;
+    margin:20px 0 8px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .section-title::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--paper-line);
+  }
+
+  .choice-grid{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .choice{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:#fff;
+    border:1.5px solid var(--paper-line);
+    border-radius:10px;
+    padding:13px 15px;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .choice.selected{
+    border-color:var(--pink);
+    background:#fbeef4;
+  }
+  .choice .name{font-size:15px; font-weight:600;}
+  .choice .count{font-size:12px; color:var(--ink-soft);}
+
+  .toggle-row{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
+    flex-wrap:wrap;
+  }
+  .toggle{
+    flex:1;
+    min-width:70px;
+    text-align:center;
+    padding:11px 6px;
+    border:1.5px solid var(--paper-line);
+    border-radius:10px;
+    background:#fff;
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .toggle.on{
+    border-color:var(--gold);
+    background:#fbeef4;
+    color:var(--pink-deep);
+  }
+
+  .start-btn{
+    width:100%;
+    margin-top:24px;
+    padding:16px;
+    border:none;
+    border-radius:12px;
+    background:var(--pink-deep);
+    color:#fff;
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:.05em;
+    cursor:pointer;
+    box-shadow: 0 8px 18px rgba(140,50,96,0.28);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .start-btn:disabled{
+    background:#c8bcc3;
+    box-shadow:none;
+  }
+  .start-btn:active{transform:translateY(1px);}
+
+  .reset-link{
+    display:block;
+    text-align:center;
+    margin-top:16px;
+    font-size:12px;
+    color:var(--ink-soft);
+    text-decoration:underline;
+    cursor:pointer;
+  }
+
+  .quiz-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:10px;
+  }
+  .quiz-head .back{
+    font-size:13px;
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .quiz-head .counter{
+    font-size:13px;
+    font-weight:700;
+    color:var(--pink-deep);
+  }
+  .progress-bar{
+    height:5px;
+    background:var(--paper-line);
+    border-radius:3px;
+    overflow:hidden;
+    margin-bottom:18px;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--gold);
+    width:0%;
+    transition:width .25s;
+  }
+  .unit-tag{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    color:var(--pink-deep);
+    background:#f3e4ec;
+    padding:3px 10px;
+    border-radius:100px;
+    margin-bottom:12px;
+    letter-spacing:.03em;
+  }
+  .card{
+    background:#fff;
+    border-radius:16px;
+    box-shadow:var(--card-shadow);
+    padding:26px 22px;
+    min-height:140px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .q-text{
+    font-size:16px;
+    line-height:1.85;
+    font-weight:500;
+  }
+
+  .answer-grid{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:18px;
+  }
+  .answer-choice{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    background:#fff;
+    border:1.5px solid var(--paper-line);
+    border-radius:12px;
+    padding:14px 15px;
+    cursor:pointer;
+    font-size:14.5px;
+    line-height:1.6;
+    transition:border-color .15s, background .15s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .answer-choice .letter{
+    flex-shrink:0;
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    background:var(--paper-line);
+    color:var(--ink-soft);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    font-weight:700;
+  }
+  .answer-choice.correct{
+    border-color:var(--ok);
+    background:var(--ok-bg);
+  }
+  .answer-choice.correct .letter{
+    background:var(--ok);
+    color:#fff;
+  }
+  .answer-choice.wrong{
+    border-color:var(--ng);
+    background:var(--ng-bg);
+  }
+  .answer-choice.wrong .letter{
+    background:var(--ng);
+    color:#fff;
+  }
+  .answer-choice.disabled{
+    cursor:default;
+  }
+
+  .a-block{
+    margin-top:16px;
+    padding:14px 16px;
+    border-radius:12px;
+    display:none;
+  }
+  .a-block.show{display:block;}
+  .a-block.ok-block{background:var(--ok-bg);}
+  .a-block.ng-block{background:var(--ng-bg);}
+  .a-label{
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.05em;
+    margin-bottom:6px;
+  }
+  .ok-block .a-label{color:var(--ok);}
+  .ng-block .a-label{color:var(--ng);}
+  .a-text{
+    font-size:14px;
+    line-height:1.75;
+    color:var(--ink);
+  }
+
+  .next-btn{
+    width:100%;
+    margin-top:18px;
+    padding:15px;
+    border:none;
+    border-radius:12px;
+    background:var(--pink-deep);
+    color:#fff;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    display:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .next-btn.show{display:block;}
+  .next-btn:active{transform:translateY(1px);}
+
+  .result-hero{
+    text-align:center;
+    padding:28px 10px 20px;
+  }
+  .result-hero .big{
+    font-family:"Hiragino Mincho ProN", serif;
+    font-size:44px;
+    font-weight:700;
+    color:var(--pink-deep);
+  }
+  .result-hero .sub{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+  .miss-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-top:14px;
+  }
+  .miss-item{
+    background:#fff;
+    border:1px solid var(--paper-line);
+    border-radius:10px;
+    padding:12px 14px;
+  }
+  .miss-item .q{font-size:13.5px; line-height:1.6;}
+  .miss-item .a{font-size:13.5px; line-height:1.6; color:var(--ok); font-weight:700; margin-top:4px;}
+  .result-actions{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:22px;
+  }
+  .btn-secondary{
+    width:100%;
+    padding:14px;
+    border:1.5px solid var(--pink-deep);
+    border-radius:12px;
+    background:#fff;
+    color:var(--pink-deep);
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+  }
+
+  .empty-note{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:13px;
+    padding:20px 10px;
+  }
+
+  .glossary-box{
+    background:#fff;
+    border:1px solid var(--paper-line);
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:14px;
+  }
+  .glossary-box .g-item{
+    font-size:12.5px;
+    line-height:1.7;
+    margin-bottom:6px;
+  }
+  .glossary-box .g-term{
+    font-weight:700;
+    color:var(--pink-deep);
+  }
+  .glossary-toggle{
+    text-align:center;
+    font-size:12px;
+    color:var(--ink-soft);
+    text-decoration:underline;
+    cursor:pointer;
+    margin-bottom:14px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">女子力検定<small>好きのサインを見抜けるか</small></div>
+  </header>
+
+  <!-- AUTH SCREEN -->
+  <section id="screen-auth" class="screen active">
+    <div class="card" style="margin-top:40px;">
+      <div class="q-text" style="text-align:center; margin-bottom:18px;">パスワードを入力してください</div>
+      <input type="password" id="auth-input" placeholder="パスワード" style="width:100%; padding:14px 15px; border:1.5px solid var(--paper-line); border-radius:10px; font-size:15px; box-sizing:border-box;">
+      <div id="auth-error" style="color:var(--ng); font-size:13px; margin-top:10px; text-align:center; display:none;">パスワードが違います</div>
+    </div>
+    <button class="start-btn" id="auth-btn">はじめる</button>
+  </section>
+
+  <!-- HOME SCREEN -->
+  <section id="screen-home" class="screen">
+    <div class="stat-row">
+      <div class="stat-card"><div class="num" id="stat-total">-</div><div class="lbl">全問題数</div></div>
+      <div class="stat-card"><div class="num" id="stat-rate">-</div><div class="lbl">正解率</div></div>
+      <div class="stat-card"><div class="num" id="stat-weak">-</div><div class="lbl">苦手な問題</div></div>
+    </div>
+
+    <div class="glossary-toggle" id="glossary-toggle">用語集を見る(好き・嫉妬 など)</div>
+    <div class="glossary-box" id="glossary-box" style="display:none;"></div>
+
+    <div class="section-title">級をえらぶ</div>
+    <div class="choice-grid" id="unit-choices"></div>
+
+    <div class="section-title">出題モード</div>
+    <div class="toggle-row">
+      <div class="toggle on" id="mode-all" data-mode="all">すべての問題</div>
+      <div class="toggle" id="mode-weak" data-mode="weak">苦手な問題だけ</div>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle on" id="shuffle-toggle" data-shuffle="1">ランダム順</div>
+      <div class="toggle" id="order-toggle" data-shuffle="0">出題順どおり</div>
+    </div>
+
+    <div class="section-title">問題数</div>
+    <div class="toggle-row" id="count-row">
+      <div class="toggle count-choice" data-count="10">10問</div>
+      <div class="toggle count-choice" data-count="20">20問</div>
+      <div class="toggle count-choice" data-count="30">30問</div>
+      <div class="toggle count-choice on" data-count="all">全部</div>
+    </div>
+
+    <button class="start-btn" id="start-btn">はじめる</button>
+    <div class="reset-link" id="reset-link">これまでの記録をリセットする</div>
+  </section>
+
+  <!-- QUIZ SCREEN -->
+  <section id="screen-quiz" class="screen">
+    <div class="quiz-head">
+      <div class="back" id="quiz-back">← やめてもどる</div>
+      <div class="counter" id="quiz-counter">1 / 10</div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+
+    <span class="unit-tag" id="quiz-unit-tag"></span>
+    <div class="card">
+      <div class="q-text" id="quiz-q"></div>
+    </div>
+
+    <div class="answer-grid" id="answer-grid"></div>
+
+    <div class="a-block" id="a-block">
+      <div class="a-label" id="a-label"></div>
+      <div class="a-text" id="a-text"></div>
+    </div>
+
+    <button class="next-btn" id="next-btn">つぎへ →</button>
+  </section>
+
+  <!-- RESULT SCREEN -->
+  <section id="screen-result" class="screen">
+    <div class="result-hero">
+      <div class="big" id="result-score">0 / 0</div>
+      <div class="sub">正解数 / 出題数</div>
+    </div>
+    <div class="section-title" id="miss-title" style="display:none;">まちがえた問題</div>
+    <div class="miss-list" id="miss-list"></div>
+    <div class="empty-note" id="perfect-note" style="display:none;">全問正解です。すごい！もう女子力マスターかも。</div>
+    <div class="result-actions">
+      <button class="start-btn" id="retry-miss-btn">まちがえた問題だけもう一度</button>
+      <button class="btn-secondary" id="result-home-btn">はじめの画面にもどる</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const APP_DATA = {"glossary": [["好き(すき)", "その子のことをもっと知りたい、そばにいたい、笑ってほしいと思う気持ち。恋愛の気持ちのこと。"], ["気になる/意識してる", "頭の中で何度もその子のことを考えてしまうこと。実はこれ、「好き」の始まりのサインです。"], ["嫉妬(しっと)", "自分より恵まれてる・うまくいってる人を見て、悔しい、うらやましいと感じる気持ち。"], ["照れ(てれ)", "恥ずかしくて、素直な態度が取れなくなること。"], ["プライド", "自分のかっこ悪いところを人に見せたくない気持ち。"], ["未練(みれん)", "別れたり諦めたりした後も、まだ好きな気持ちが残っていること。"]], "questions": [{"id": "q1", "u": "5級(基本編)", "q": "女の子が、好きでもない男の子に告白されて「友達としてなら」と答えた。これはどういう意味?", "choices": ["今はまだわからないという意味", "本当は好きじゃなくて、やさしく断ってる", "本当は付き合いたいという意味", "友達より恋人になりたいという意味"], "correctIndex": 1, "explain": "本当は好きじゃないってこと。「好きじゃない」とはっきり言うと相手が傷つくから、やさしい言い方で断ってる。"}, {"id": "q2", "u": "5級(基本編)", "q": "女の子が男の子の話をずっと否定的に言ってくる。なぜ?", "choices": ["本当に嫌いだから", "からかいたいだけ", "実はその子のことが好きで意識してる", "話のネタがないから"], "correctIndex": 2, "explain": "実はその子のことが好きってこと。本当にどうでもいい相手なら、話題にすら出さない。悪口っぽく聞こえても、意識してるサインのことが多い。"}, {"id": "q3", "u": "5級(基本編)", "q": "女の子が誕生日に手作りのお菓子をくれた。理由は?", "choices": ["みんなに配ってる", "ただのお礼", "余ってたから配っただけ", "実は好きだから、特別に作った"], "correctIndex": 3, "explain": "実は好きってこと。お店で買えば簡単なのに、わざわざ手間のかかる手作りをするのは、特別な相手だと思ってるから。"}, {"id": "q4", "u": "5級(基本編)", "q": "女の子が男の子のSNSの投稿に毎回いち早く「いいね」を押してくる。なぜ?", "choices": ["いいねを稼ぎたいから", "実は好きで、いつも見てるから", "友達に頼まれたから", "たまたま気づいただけ"], "correctIndex": 1, "explain": "実は好きってこと。好きな子の投稿は気になって、他の人より先にチェックしてしまう。"}, {"id": "q5", "u": "5級(基本編)", "q": "女の子が男の子と目が合うとすぐそらす。これはどういう心理?", "choices": ["目が悪いから", "嫌いだから見たくない", "実は好きで、恥ずかしいから", "興味がないから"], "correctIndex": 2, "explain": "実は好きで、恥ずかしいってこと。どうでもいい相手なら、目が合っても普通に見返せる。"}, {"id": "q6", "u": "5級(基本編)", "q": "女の子がグループLINEで、ある男の子にだけ個別にスタンプを送ってくる。なぜ?", "choices": ["間違えて送った", "グループが苦手だから", "スタンプを試したいだけ", "実はその子のことが好きだから"], "correctIndex": 3, "explain": "実はその子のことが好きで、その子だけと特別にやり取りしたいってこと。"}, {"id": "q7", "u": "5級(基本編)", "q": "女の子が「今度みんなで遊ぼうよ」と言いながら、実は特定の男の子が来るかを気にしている。なぜ?", "choices": ["他に誘う人がいないから", "実はその子に会いたいから", "暇だから誘っただけ", "本当にみんなと遊びたいだけ"], "correctIndex": 1, "explain": "実はその子に会いたいってこと。「みんなで」というのは、会いたい気持ちを隠すための口実。"}, {"id": "q8", "u": "5級(基本編)", "q": "女の子が男の子の忘れ物にすぐ気づいて届けてくれる。なぜ?", "choices": ["実は好きで、よく見てるから", "親切なだけで誰にでもする", "たまたま気づいただけ", "先生に頼まれたから"], "correctIndex": 0, "explain": "実は好きってこと。好きな子のことはふだんからよく見てるので、ちょっとした変化にもすぐ気づく。"}, {"id": "q9", "u": "5級(基本編)", "q": "女の子が男の子の悪口を言う友達に「そんなことないよ」とすぐ反論する。なぜ?", "choices": ["悪口を言う子が嫌いだから", "正義感が強いから", "先生に見られてるから", "実は好きで、守りたいから"], "correctIndex": 3, "explain": "実は好きで、その子を守りたいってこと。どうでもいい相手なら、悪口を聞いても反論せずに聞き流すだけ。"}, {"id": "q10", "u": "5級(基本編)", "q": "女の子が席替えのときにさりげなく近くの席を希望する。なぜ?", "choices": ["黒板が見やすいから", "実はその子の近くにいたいから", "友達と近くがよかったから", "たまたま良い場所だったから"], "correctIndex": 1, "explain": "実はその子の近くにいたいってこと。たまたま近くの席がいい、というフリをしているだけ。"}, {"id": "q11", "u": "5級(基本編)", "q": "お友達の女の子が、彼氏と昔好きだったという理由でいじめられた。なぜ?", "choices": ["彼氏が今も好きなのか不安になったから", "仲間はずれが好きだから", "その子が意地悪だから", "ルールを破ったから"], "correctIndex": 0, "explain": "いじめた子は、彼氏が今もその子(お友達)を好きなんじゃないかと不安になった。その不安から嫉妬(悔しい・不安な気持ち)が生まれて、いじめという意地悪な行動になって出てしまっている。"}, {"id": "q12", "u": "5級(基本編)", "q": "テストで良い点を取った子が、急に女の子グループで無視されるようになった。なぜ?", "choices": ["勉強しない子が嫌いだから", "ルール違反をしたから", "負けた悔しさをぶつけているから", "仲間外れが楽しいから"], "correctIndex": 2, "explain": "無視した子たちは、自分が負けた気がして悔しかった。この悔しい気持ち(嫉妬)を、良い点を取った子にぶつけてしまっている。良い点を取った子は何も悪くない。"}, {"id": "q13", "u": "4級", "q": "LINEの既読がついてるのに返信が遅い。理由は?", "choices": ["絶対に嫌われている", "スマホを落としたから", "理由はいろいろあり、嫌われたとは限らない", "LINEを見ていないから"], "correctIndex": 2, "explain": "理由はいろいろある。照れてる、何を書くか悩んでる、わざと時間をあけてる、など。「既読なのに返信が遅い=嫌われた」と決めつけるのは間違い。"}, {"id": "q14", "u": "4級", "q": "女の子グループで、一人だけ急に話しかけられなくなった。原因は?", "choices": ["見えないところで妬まれたなど理由がある", "先生に叱られたから", "偶然仲間外れになった", "本人が何か悪いことをした"], "correctIndex": 0, "explain": "喧嘩をしていなくても、陰口を言われた・彼氏のことで妬まれた(嫉妬された)など、見えないところで理由があることが多い。話しかけられなくなった子が悪いとは限らない。"}, {"id": "q15", "u": "4級", "q": "女の子が「別に怒ってないけど」と言いながら明らかに態度が冷たい。なぜ?", "choices": ["体調が悪いだけ", "本当は怒っていて、それを隠してる", "本当に怒っていない", "疲れているだけ"], "correctIndex": 1, "explain": "本当は怒ってるってこと。「怒ってる」と認めると、自分が気にしてることがバレてしまうので隠している。"}, {"id": "q16", "u": "4級", "q": "好きな子に彼女ができたと聞いた女の子が、急にその子を褒め始めた。なぜ?", "choices": ["興味がないから", "本当はショックで平気なフリをしてる", "本当にうれしいと思ってる", "からかっているだけ"], "correctIndex": 1, "explain": "本当はショックで、嫌な気持ちになってるってこと。つらい気持ちを隠して、平気なフリをがんばってる。"}, {"id": "q17", "u": "4級", "q": "女の子が「私にはもったいないよ」と自分から身を引くようなことを言う。本音は?", "choices": ["謙遜しているだけ", "本当に自信がないだけ", "冗談で言っている", "本当は好かれたいけど傷つくのが怖い"], "correctIndex": 3, "explain": "本当は好かれたい、一緒にいたいってこと。でも傷つくのが怖いから、先に自分から諦めたフリをしている。"}, {"id": "q18", "u": "4級", "q": "女の子が友達に相談しながらも、結局は自分ですでに答えを決めている様子だった。なぜ相談したのか?", "choices": ["本当にアドバイスが欲しい", "背中を押してほしいだけ", "ただの暇つぶし", "話を聞いてほしいだけ"], "correctIndex": 1, "explain": "答えが欲しいわけじゃなく、「それでいいよ」と友達に背中を押してほしいだけのことが多い。"}, {"id": "q19", "u": "4級", "q": "女の子が男の子とのやり取りのスクリーンショットを友達に見せて回る。なぜ?", "choices": ["嬉しくて共有したいから", "証拠を残したいだけ", "自慢したいだけ", "相談したいだけ"], "correctIndex": 0, "explain": "うれしい出来事だから、誰かに話を聞いてほしい、一緒に喜んでほしいってこと。"}, {"id": "q20", "u": "4級", "q": "女の子が「そういうのじゃないから」と何度も否定するが、周りにはバレバレ。なぜ本人だけ必死に否定するのか?", "choices": ["からかわれて嫌だから", "本当にそうじゃないから", "友達に言われて否定してるだけ", "実は好きで、認めたくないから"], "correctIndex": 3, "explain": "実は好きなのに、それを自分でも認めたくないってこと。好きだと認めてしまうと、後戻りできない気がして怖い。"}, {"id": "q21", "u": "4級", "q": "女の子が男の子グループの集合写真で、意図的に特定の子の隣に写ろうとする。なぜ?", "choices": ["たまたま並んだだけ", "実はその子の近くにいたいから", "写真写りがいい場所だから", "カメラマンに言われたから"], "correctIndex": 1, "explain": "実はその子の近くにいたいってこと。写真という形で、その子との距離の近さを残しておきたい。"}, {"id": "q22", "u": "4級", "q": "女の子が突然、好きな子と共通の趣味を持ち始めた。なぜ?", "choices": ["話すきっかけが欲しいから", "流行っているから", "本当に興味を持っただけ", "友達に勧められたから"], "correctIndex": 0, "explain": "実はその子ともっと話したいってこと。話すきっかけがほしくて、自分から共通点を作っている。"}, {"id": "q23", "u": "4級", "q": "かわいい・かっこいいと言われる子が、陰口を言われやすい。なぜ?", "choices": ["嘘をついているから", "その子が性格悪いから", "目立ちたがりだから", "嫉妬で悔しいから"], "correctIndex": 3, "explain": "陰口を言う子は、褒められてる子を見て自分と比べ、悔しい気持ち(嫉妬)になっている。その悔しさを悪口という形で発散してしまっている。"}, {"id": "q24", "u": "4級", "q": "先生に褒められた子が、後で友達に冷たくされた。なぜ?", "choices": ["たまたま忙しかっただけ", "嫉妬でずるいと感じたから", "先生の勘違いだから", "褒められた子が自慢したから"], "correctIndex": 1, "explain": "冷たくした子は「自分より認められてずるい」と悔しく感じている(嫉妬)。褒められた子が悪いことをしたわけではない。"}, {"id": "q25", "u": "3級", "q": "好きな子の前でわざと素っ気ない態度をとる女の子がいる理由は?", "choices": ["機嫌が悪いだけ", "話すことがないだけ", "好きでバレるのが恥ずかしいから(ツンデレ)", "本当に嫌いだから"], "correctIndex": 2, "explain": "実は好きで、それがバレるのが恥ずかしいってこと。好きな気持ちを隠すために、あえて冷たい態度をとってしまう(いわゆるツンデレ)。"}, {"id": "q26", "u": "3級", "q": "女友達が「彼氏と別れたら?」としつこく言ってくる。表面上は心配だと言うが…", "choices": ["心配、または嫉妬の場合もある", "絶対にただの心配", "彼氏を狙っているだけ", "絶対に嫉妬"], "correctIndex": 0, "explain": "本当に心配してるだけのこともあるけど、実は自分と比べてうらやましい・悔しいという気持ち(嫉妬)のこともある。言葉だけで決めつけないことが大事。"}, {"id": "q27", "u": "3級", "q": "女の子が「私はいいから、あなたたち付き合いなよ」と積極的にくっつけようとする。本心は?", "choices": ["冗談で言っているだけ", "関係ない話", "絶対に本当に応援してる", "本当は好きだけど諦めて隠してることも"], "correctIndex": 3, "explain": "本当に応援していることもあれば、実は自分もその子を好きだけど、諦めて隠していることもある。言葉だけでは本心はわからない。"}, {"id": "q28", "u": "3級", "q": "女の子が好きな子の元カノの写真を何度も見返している。なぜ?", "choices": ["ただの暇つぶし", "写真が上手だから", "比較して不安、タイプを気にしてる", "元カノが嫌いだから見てる"], "correctIndex": 2, "explain": "自分と元カノを比べて不安になっている、または「その子はどんな女の子が好きなんだろう」と気にしているってこと。"}, {"id": "q29", "u": "3級", "q": "女の子が「もう子供っぽいこと言わないで」と急に大人ぶった態度を取り始めた。なぜ?", "choices": ["子供っぽく見られたくないから", "本当に大人になったから", "テレビの真似をしてるだけ", "反抗期なだけ"], "correctIndex": 0, "explain": "好きな子に子供っぽいと思われたくない、大人として対等に見てほしいってこと。"}, {"id": "q30", "u": "3級", "q": "女の子が男の子に対して過剰に厳しくダメ出しをする。なぜ嫌いなわけではないのか?", "choices": ["完璧主義な性格なだけ", "みんなに厳しいだけ", "本当に嫌いだから", "好きだから期待して厳しくなる"], "correctIndex": 3, "explain": "実は好きだからこそ、もっと良くなってほしくて、つい厳しいことを言ってしまう。どうでもいい相手には期待もしない。"}, {"id": "q31", "u": "3級", "q": "女の子が友達の恋愛相談には熱心に乗るのに、自分の話は一切しない。なぜ?", "choices": ["秘密主義な性格なだけ", "話すのが苦手なだけ", "自分の気持ちを知られたくないから", "恋愛に興味がないから"], "correctIndex": 2, "explain": "自分の好きな気持ちを知られるのが恥ずかしい、または弱いところを見せたくないってこと。"}, {"id": "q32", "u": "3級", "q": "女の子が好きな子と喧嘩した後、あえて素っ気なく無視を続ける。本当の気持ちは?", "choices": ["本当にもう嫌いになった", "仲直りしたいが意地を張ってる", "先生に怒られたから", "忙しいだけ"], "correctIndex": 1, "explain": "本当は仲直りしたいけど、自分から謝るのが恥ずかしくて、意地を張ってしまっているだけ。"}, {"id": "q33", "u": "3級", "q": "女の子が「私、別に彼のこと気にしてないよ」と誰にも聞かれていないのに言い出す。なぜ?", "choices": ["話題を変えたいだけ", "実はすごく気にしてるから", "本当に気にしていない", "みんなに聞いてほしいだけ"], "correctIndex": 1, "explain": "実はすごく気にしてる(好き)ってこと。自分にも周りにも「気にしてない」と言い聞かせている。"}, {"id": "q34", "u": "3級", "q": "女の子が好きな子の家族構成や誕生日など細かい情報をすでに把握している。なぜ?", "choices": ["たまたま聞いただけ", "友達に聞いただけ", "好きだから自然と覚えてしまう", "記憶力がいいだけ"], "correctIndex": 2, "explain": "実は好きってこと。好きな相手のことは、意識しなくても自然といろいろ覚えてしまう。"}, {"id": "q35", "u": "3級", "q": "仲良しグループの一人だけ、新しくできた友達の話を聞くと不機嫌になる。なぜ?", "choices": ["新しい友達が嫌いだから", "自分より優先されるかもという不安・嫉妬", "特に関係ない話", "疲れているだけ"], "correctIndex": 1, "explain": "「自分より新しい友達を優先されるかも」という不安が、悔しい気持ち(嫉妬)になって、意地悪な態度に変わってしまっている。"}, {"id": "q36", "u": "3級", "q": "SNSでかわいい写真を載せた子が、コメント欄で悪口を書かれた。なぜ?", "choices": ["嫉妬で悔しいから", "いたずらしたいだけ", "本当に変な写真だから", "関係ない人が書いただけ"], "correctIndex": 0, "explain": "悪口を書いた子は、自分にはない可愛さや自信を見せられて悔しくなっている(嫉妬)。その悔しさが攻撃的な言葉になって出てしまっている。"}, {"id": "q37", "u": "2級", "q": "好きな子が他の女の子と仲良くしてるのを見て不機嫌になった女の子。本人に聞くと「別に何とも思ってない」と言う。矛盾をどう解釈する?", "choices": ["実は嫉妬してるが認めたくない", "本当に何とも思ってない", "体調が悪いだけ", "疲れてるだけ"], "correctIndex": 0, "explain": "実は好きだから、悔しくて不機嫌になっている(嫉妬)。ただ、その気持ちを自分でも認めたくないだけ。"}, {"id": "q38", "u": "2級", "q": "女の子が別れた元カレの近況をよく聞いてくる。なぜ?", "choices": ["友達として心配なだけ", "ただ暇だから", "絶対にもう興味ない", "まだ好き、またはプライドから気になる"], "correctIndex": 3, "explain": "まだ好きとは限らない。「自分と別れた後、その子が自分より幸せになってないか気になる」というプライド(かっこ悪いところを見せたくない気持ち)からのこともある。"}, {"id": "q39", "u": "2級", "q": "女の子が「あの二人、お似合いだよね」と笑顔で言うが、その後ずっと元気がない。本心は?", "choices": ["本当に祝福してる", "関係ない話をしてただけ", "本当はショックを受けてる", "疲れているだけ"], "correctIndex": 2, "explain": "本当はショックを受けて、嫌な気持ちになってるってこと。表では笑って我慢している。"}, {"id": "q40", "u": "2級", "q": "女の子が好きな子に彼女ができた途端、その子とは距離を置き始めた。なぜ避けるのか?", "choices": ["つらい気持ちを見せたくない・未練が消えないから", "本当に興味がなくなった", "忙しくなっただけ", "喧嘩したから"], "correctIndex": 0, "explain": "つらい気持ちを見せたくない、または近くにいるとまだ好きな気持ちが消えないから、あえて離れているってこと。"}, {"id": "q41", "u": "2級", "q": "女の子が「私が悪いんだよね、ごめん」と、本当は自分に非がない場面でも謝る。なぜ?", "choices": ["謝るのが癖なだけ", "先生に言われたから", "本当に自分が悪いから", "関係が壊れる方が怖いから"], "correctIndex": 3, "explain": "自分が正しいと言い張るより、その子との関係が壊れる方が怖いから、先に謝ってしまうってこと。"}, {"id": "q42", "u": "2級", "q": "女の子が好きな子との思い出の場所に一人で行っていたことがわかった。なぜ?", "choices": ["偶然通っただけ", "写真を撮りたかっただけ", "まだ気持ちの整理がついてない(未練)", "ただの散歩"], "correctIndex": 2, "explain": "まだ気持ちの整理ができていない、好きな気持ちがまだ残っている(未練)ってこと。"}, {"id": "q43", "u": "2級", "q": "女の子が「もう恋愛とかいいや」と急に言い出した。額面通りに受け取っていいか?", "choices": ["傷つかないための予防線のことが多い", "本当にもう興味がない", "勉強に集中したいだけ", "親に言われたから"], "correctIndex": 0, "explain": "本心じゃないことが多い。前の恋愛でつらい思いをして、これ以上傷つかないように自分を守っているだけ。"}, {"id": "q44", "u": "2級", "q": "女の子が友達には好きな子について話すのに、本人には素っ気ない態度しか取れない。なぜこの差があるのか?", "choices": ["恥ずかしがり屋なだけ", "特に関係ない話", "本人が嫌いだから", "本人の前では嫌われるのが怖い"], "correctIndex": 3, "explain": "本人の前だと、好きだとバレて嫌われるのが怖くて本音を隠す。友達の前なら安心して本当の気持ちを話せる。"}, {"id": "q45", "u": "2級", "q": "女の子が好きな子の新しい恋人にだけ、やたら優しく親切にする。なぜ?", "choices": ["特に意味はない", "新しい恋人が好みだから", "複雑な気持ちを隠して良い子でいようとしてる", "本当に仲良くなりたいだけ"], "correctIndex": 2, "explain": "本当は複雑でつらい気持ちだけど、それを隠して「感じのいい子」でいようとがんばっているってこと。"}, {"id": "q46", "u": "2級", "q": "女の子が「私たち友達だからわかるけど」と、好きな子について妙に詳しく分析してみせる。なぜ?", "choices": ["本当にただの友達として詳しいだけ", "好きだから詳しいのを友達を理由にごまかしてる", "暇だから観察してるだけ", "特に関係ない"], "correctIndex": 1, "explain": "「友達だから」という理由を使って、実は好きだから詳しいという本当の理由を隠しているってこと。"}, {"id": "q47", "u": "2級", "q": "習い事で一番になった子を、他の子たちがわざと仲間はずれにした。なぜ?", "choices": ["ルールを破ったから", "偶然仲間はずれになった", "一番になった子が生意気だから", "嫉妬のやり場がないから"], "correctIndex": 3, "explain": "仲間はずれにした子たちは、自分が一番になれなかった悔しさ(嫉妬)のやり場がなく、その子への態度に出してしまっている。"}, {"id": "q48", "u": "2級", "q": "彼氏ができた子が、女友達から急にそっけなくされるようになった。なぜ?", "choices": ["彼氏が嫌いだから", "特に関係ない", "置いていかれる不安・嫉妬から", "彼氏ができた子が変わったから"], "correctIndex": 2, "explain": "「自分だけ置いていかれる」という不安や悔しさ(嫉妬)からきている。彼氏ができた子が何か悪いことをしたわけではない。"}, {"id": "q49", "u": "1級(上級編)", "q": "好きな人ができた女の子が、急に今まで仲良かった男友達と距離を置き始めた。理由は?", "choices": ["誤解されたくない・自分の気持ちに気をつけてる", "忙しくなっただけ", "特に関係ない", "本当に嫌いになったから"], "correctIndex": 0, "explain": "好きな子に「他の男の子と仲良くしてる」と誤解されたくない、または自分の気持ちが揺れないように自分で気をつけているってこと。"}, {"id": "q50", "u": "1級(上級編)", "q": "女の子が「もう全然気にしてないから」と3回も言ってくる。", "choices": ["本当に気にしていない", "話を終わらせたいだけ", "実はまだ気にしてる証拠", "ただの口癖"], "correctIndex": 2, "explain": "本当に気にしてないなら、わざわざ言わない。何度も言うのは、実はまだ好きで、気にしてる証拠。"}, {"id": "q51", "u": "1級(上級編)", "q": "女の子が好きな子に嫌われるくらいなら、告白せず今の関係を維持する道を選んだ。なぜ勇気を出さないのか?", "choices": ["特に関係ない", "本当は好きじゃないから", "勇気がないだけの性格", "振られて友達も失う怖さがあるから"], "correctIndex": 3, "explain": "告白して振られたら、友達としての関係もなくなってしまうかもしれない。そのリスクが怖くて、今のままの関係を選んでいる。"}, {"id": "q52", "u": "1級(上級編)", "q": "女の子が「本当は気づいてたけど、あえて聞かなかった」と後から打ち明けた。なぜその場では聞かなかったのか?", "choices": ["聞くタイミングがなかっただけ", "つらい現実を避けたかったから", "忘れていただけ", "興味がなかったから"], "correctIndex": 1, "explain": "答えを聞いてしまうと、つらい現実がはっきりしてしまうのが怖かったから、あえて聞かないことを選んだ。"}, {"id": "q53", "u": "1級(上級編)", "q": "女の子が好きな子と両想いになった後も、しばらく素直に喜びを見せなかった。なぜ?", "choices": ["本当は微妙な気持ちだから", "特に意味はない", "うれしすぎてすぐ実感できないから", "照れ隠しの演技なだけ"], "correctIndex": 2, "explain": "長い間片思いだった分、うれしすぎて逆にすぐには実感できない、信じられないってこと。"}, {"id": "q54", "u": "1級(上級編)", "q": "女の子が親友の恋人を好きになってしまい、誰にも言わずにその気持ちを隠し通した。この沈黙の意味は?", "choices": ["友情を壊したくないから我慢してる", "本当にただの憧れなだけ", "特に関係ない", "気づいていないだけ"], "correctIndex": 0, "explain": "親友との友情を壊したくないから、自分の好きな気持ちを我慢して、誰にも言わずに隠しているってこと。"}, {"id": "q55", "u": "1級(上級編)", "q": "女の子が「もう昔の話だから」と過去の恋愛を軽く扱うが、特定の話題になると急に口数が減る。なぜ矛盾するのか?", "choices": ["話題が苦手なだけ", "未練が残ってるから", "特に関係ない", "本当に忘れたから"], "correctIndex": 1, "explain": "本人は忘れたつもりでも、心のどこかにまだ好きだった気持ち(未練)が残っていて、その話題に触れると出てきてしまう。"}, {"id": "q56", "u": "1級(上級編)", "q": "女の子が長年片思いしていた相手が振り向いた瞬間、逆に気持ちが冷めてしまった。なぜこの逆転が起きるのか?", "choices": ["特に関係ない", "相手が変わったから", "手に入らないから好きだった、目的が消えた", "気が変わりやすい性格なだけ"], "correctIndex": 2, "explain": "「手に入らないから好きだった」という気持ちで、実際に両想いになって手に入った途端、それ以上好きでいる理由がなくなってしまったってこと。"}, {"id": "q57", "u": "1級(上級編)", "q": "女の子が自分を傷つけた相手を、周囲が非難しても最後までかばい続けた。この行動の裏にある心理は?", "choices": ["自分の気持ちまで否定されるようでつらい", "本当にその子は悪くないから", "かばうのが好きな性格なだけ", "特に関係ない"], "correctIndex": 0, "explain": "相手を悪く言われると、その子を好きだった自分の気持ちまで否定された気がしてつらい。だからその子をかばってしまう。"}, {"id": "q58", "u": "1級(上級編)", "q": "女の子が「もう友達でいい」と自分に言い聞かせながら、実際の行動は友達以上の距離感を保ち続けている。なぜ言葉と行動が一致しないのか?", "choices": ["ただの癖でそうなる", "特に関係ない", "本当に友達関係が心地よいだけ", "頭では諦めても気持ちは残ってる(未練)"], "correctIndex": 3, "explain": "頭では諦めようとしていても、心の中ではまだ好きな気持ち(未練)が残っていて、行動にそのまま出てしまっているってこと。"}, {"id": "q59", "u": "1級(上級編)", "q": "誰かの悪口を一緒に言わないと、自分も仲間はずれにされそうな空気がある。なぜみんな悪口に乗ってしまうのか?", "choices": ["特に関係ない", "本当にその子が嫌いだから", "自分が標的にされる怖さから", "悪口を言うのが楽しいから"], "correctIndex": 2, "explain": "本当は悪口を言いたくなくても、次は自分が標的にされるかもしれないという怖さから、周りに合わせてしまっているってこと。"}, {"id": "q60", "u": "1級(上級編)", "q": "いじめられている子が「私が悪いのかな」と自分を責めている。これは正しい考え方?", "choices": ["運が悪かっただけ", "正しい。本当に何か悪いことをした", "正しくない。いじめる側の嫉妬が原因", "性格が原因"], "correctIndex": 2, "explain": "正しくない。いじめの原因は、ほとんどの場合いじめる側の悔しさや不安(嫉妬)であって、いじめられている子が悪いわけではない。"}]};
+const QUESTIONS = APP_DATA.questions;
+const GLOSSARY = APP_DATA.glossary;
+const LETTERS = ["A","B","C","D"];
+
+let stats = {};
+let currentUnit = "ALL";
+let currentMode = "all";
+let currentShuffle = true;
+let questionCount = "all";
+let quizQueue = [];
+let quizPos = 0;
+let quizResults = [];
+let answered = false;
+
+const els = {};
+["screen-home","screen-quiz","screen-result",
+ "stat-total","stat-rate","stat-weak","unit-choices",
+ "mode-all","mode-weak","shuffle-toggle","order-toggle",
+ "start-btn","reset-link","glossary-toggle","glossary-box",
+ "quiz-back","quiz-counter","progress-fill","quiz-unit-tag",
+ "quiz-q","answer-grid","a-block","a-label","a-text","next-btn",
+ "result-score","miss-title","miss-list","perfect-note","retry-miss-btn","result-home-btn"
+].forEach(id => els[id] = document.getElementById(id));
+
+function showScreen(name){
+  ["screen-auth","screen-home","screen-quiz","screen-result"].forEach(id=>{
+    els[id].classList.toggle("active", id === name);
+  });
+  window.scrollTo(0,0);
+}
+
+const PASSWORD = "shakaikosuke";
+const authInput = document.getElementById("auth-input");
+const authBtn = document.getElementById("auth-btn");
+const authError = document.getElementById("auth-error");
+function tryAuth(){
+  if(authInput.value === PASSWORD){
+    authError.style.display = "none";
+    renderHome();
+    showScreen("screen-home");
+  }else{
+    authError.style.display = "block";
+    authInput.value = "";
+    authInput.focus();
+  }
+}
+authBtn.addEventListener("click", tryAuth);
+authInput.addEventListener("keydown", (e)=>{
+  if(e.key === "Enter") tryAuth();
+});
+
+const STORAGE_KEY = "joshiryoku_stats_v1";
+async function loadStats(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY);
+    stats = res && res.value ? JSON.parse(res.value) : {};
+  }catch(e){
+    stats = {};
+  }
+}
+async function saveStats(){
+  try{
+    await window.storage.set(STORAGE_KEY, JSON.stringify(stats));
+  }catch(e){
+    console.error("save failed", e);
+  }
+}
+
+function isWeak(q){
+  const s = stats[q.id];
+  if(!s) return false;
+  return (s.wrong||0) > 0 && (s.wrong||0) >= (s.correct||0);
+}
+
+function getUnits(){
+  const set = [];
+  QUESTIONS.forEach(d=>{ if(!set.includes(d.u)) set.push(d.u); });
+  return set;
+}
+
+function unitIndices(unit){
+  const arr = [];
+  QUESTIONS.forEach((d,i)=>{ if(unit==="ALL" || d.u===unit) arr.push(i); });
+  return arr;
+}
+
+function renderGlossary(){
+  els["glossary-box"].innerHTML = GLOSSARY.map(([term,def])=>
+    `<div class="g-item"><span class="g-term">${escapeHtml(term)}:</span> ${escapeHtml(def)}</div>`
+  ).join("");
+}
+els["glossary-toggle"].addEventListener("click", ()=>{
+  const box = els["glossary-box"];
+  const show = box.style.display === "none";
+  box.style.display = show ? "block" : "none";
+  els["glossary-toggle"].textContent = show ? "用語集をとじる" : "用語集を見る(好き・嫉妬 など)";
+});
+
+function renderHome(){
+  const total = QUESTIONS.length;
+  let correctSum = 0, attemptSum = 0, weakCount = 0;
+  QUESTIONS.forEach((d)=>{
+    const s = stats[d.id];
+    if(s){
+      correctSum += (s.correct||0);
+      attemptSum += (s.correct||0) + (s.wrong||0);
+    }
+    if(isWeak(d)) weakCount++;
+  });
+  els["stat-total"].textContent = total;
+  els["stat-rate"].textContent = attemptSum>0 ? Math.round(correctSum/attemptSum*100)+"%" : "-";
+  els["stat-weak"].textContent = weakCount;
+
+  const units = getUnits();
+  els["unit-choices"].innerHTML = "";
+  els["unit-choices"].appendChild(makeUnitChoice("ALL", "全級まとめて", total));
+  units.forEach(u=>{
+    const cnt = unitIndices(u).length;
+    els["unit-choices"].appendChild(makeUnitChoice(u, u, cnt));
+  });
+  refreshUnitSelection();
+  refreshStartButton();
+}
+
+function makeUnitChoice(key, label, count){
+  const div = document.createElement("div");
+  div.className = "choice";
+  div.dataset.unit = key;
+  div.innerHTML = '<span class="name">'+escapeHtml(label)+'</span><span class="count">'+count+'問</span>';
+  div.addEventListener("click", ()=>{
+    currentUnit = key;
+    refreshUnitSelection();
+    refreshStartButton();
+  });
+  return div;
+}
+
+function refreshUnitSelection(){
+  document.querySelectorAll("#unit-choices .choice").forEach(el=>{
+    el.classList.toggle("selected", el.dataset.unit === currentUnit);
+  });
+}
+
+function refreshStartButton(){
+  const pool = buildPool();
+  const n = questionCount === "all" ? pool.length : Math.min(questionCount, pool.length);
+  els["start-btn"].disabled = pool.length === 0;
+  els["start-btn"].textContent = pool.length === 0 ? "この条件の問題はありません" : "はじめる（"+n+"問）";
+}
+
+function buildPool(){
+  let pool = unitIndices(currentUnit);
+  if(currentMode === "weak"){
+    pool = pool.filter(i => isWeak(QUESTIONS[i]));
+  }
+  return pool;
+}
+
+els["mode-all"].addEventListener("click", ()=>{
+  currentMode = "all";
+  els["mode-all"].classList.add("on");
+  els["mode-weak"].classList.remove("on");
+  refreshStartButton();
+});
+els["mode-weak"].addEventListener("click", ()=>{
+  currentMode = "weak";
+  els["mode-weak"].classList.add("on");
+  els["mode-all"].classList.remove("on");
+  refreshStartButton();
+});
+els["shuffle-toggle"].addEventListener("click", ()=>{
+  currentShuffle = true;
+  els["shuffle-toggle"].classList.add("on");
+  els["order-toggle"].classList.remove("on");
+});
+els["order-toggle"].addEventListener("click", ()=>{
+  currentShuffle = false;
+  els["order-toggle"].classList.add("on");
+  els["shuffle-toggle"].classList.remove("on");
+});
+
+document.querySelectorAll(".count-choice").forEach(el=>{
+  el.addEventListener("click", ()=>{
+    questionCount = el.dataset.count === "all" ? "all" : parseInt(el.dataset.count, 10);
+    document.querySelectorAll(".count-choice").forEach(c=>c.classList.remove("on"));
+    el.classList.add("on");
+    refreshStartButton();
+  });
+});
+
+els["reset-link"].addEventListener("click", async ()=>{
+  if(confirm("これまでの正解・不正解の記録をすべて消します。よろしいですか？")){
+    stats = {};
+    await saveStats();
+    renderHome();
+  }
+});
+
+function shuffleArr(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+els["start-btn"].addEventListener("click", ()=>{
+  let pool = buildPool();
+  if(pool.length===0) return;
+  if(currentShuffle) pool = shuffleArr(pool);
+  if(questionCount !== "all") pool = pool.slice(0, questionCount);
+  quizQueue = pool;
+  quizPos = 0;
+  quizResults = [];
+  startQuizCard();
+  showScreen("screen-quiz");
+});
+
+function startQuizCard(){
+  answered = false;
+  const idx = quizQueue[quizPos];
+  const d = QUESTIONS[idx];
+  els["quiz-unit-tag"].textContent = d.u;
+  els["quiz-q"].textContent = d.q;
+  els["a-block"].classList.remove("show");
+  els["next-btn"].classList.remove("show");
+  els["quiz-counter"].textContent = (quizPos+1)+" / "+quizQueue.length;
+  els["progress-fill"].style.width = (quizPos/quizQueue.length*100)+"%";
+
+  const grid = els["answer-grid"];
+  grid.innerHTML = "";
+  d.choices.forEach((choiceText, i)=>{
+    const div = document.createElement("div");
+    div.className = "answer-choice";
+    div.innerHTML = '<span class="letter">'+LETTERS[i]+'</span><span>'+escapeHtml(choiceText)+'</span>';
+    div.addEventListener("click", ()=>selectAnswer(i));
+    grid.appendChild(div);
+  });
+}
+
+function selectAnswer(choiceIdx){
+  if(answered) return;
+  answered = true;
+  const idx = quizQueue[quizPos];
+  const d = QUESTIONS[idx];
+  const correct = choiceIdx === d.correctIndex;
+
+  const choiceEls = els["answer-grid"].querySelectorAll(".answer-choice");
+  choiceEls.forEach((el, i)=>{
+    el.classList.add("disabled");
+    if(i === d.correctIndex) el.classList.add("correct");
+    else if(i === choiceIdx) el.classList.add("wrong");
+  });
+
+  els["a-block"].classList.remove("ok-block","ng-block");
+  els["a-block"].classList.add(correct ? "ok-block" : "ng-block", "show");
+  els["a-label"].textContent = correct ? "せいかい！" : "ざんねん…";
+  els["a-text"].textContent = d.explain;
+  els["next-btn"].classList.add("show");
+  els["next-btn"].textContent = (quizPos+1 >= quizQueue.length) ? "けっかを見る →" : "つぎへ →";
+
+  recordResult(d, correct);
+}
+
+async function recordResult(d, correct){
+  if(!stats[d.id]) stats[d.id] = {correct:0, wrong:0};
+  if(correct) stats[d.id].correct = (stats[d.id].correct||0) + 1;
+  else stats[d.id].wrong = (stats[d.id].wrong||0) + 1;
+  await saveStats();
+  quizResults.push({idx: QUESTIONS.indexOf(d), correct});
+}
+
+els["next-btn"].addEventListener("click", ()=>{
+  quizPos++;
+  if(quizPos >= quizQueue.length){
+    finishQuiz();
+  }else{
+    startQuizCard();
+  }
+});
+
+els["quiz-back"].addEventListener("click", ()=>{
+  if(quizResults.length===0 || confirm("とちゅうでやめますか？ここまでの記録は保存されます。")){
+    renderHome();
+    showScreen("screen-home");
+  }
+});
+
+function finishQuiz(){
+  els["progress-fill"].style.width = "100%";
+  const correctCount = quizResults.filter(r=>r.correct).length;
+  els["result-score"].textContent = correctCount+" / "+quizResults.length;
+
+  const misses = quizResults.filter(r=>!r.correct);
+  els["miss-list"].innerHTML = "";
+  if(misses.length===0){
+    els["miss-title"].style.display = "none";
+    els["perfect-note"].style.display = "block";
+    els["retry-miss-btn"].style.display = "none";
+  }else{
+    els["miss-title"].style.display = "block";
+    els["perfect-note"].style.display = "none";
+    els["retry-miss-btn"].style.display = "block";
+    misses.forEach(m=>{
+      const d = QUESTIONS[m.idx];
+      const div = document.createElement("div");
+      div.className = "miss-item";
+      div.innerHTML = '<div class="q">'+escapeHtml(d.q)+'</div><div class="a">'+escapeHtml(d.choices[d.correctIndex])+'</div>';
+      els["miss-list"].appendChild(div);
+    });
+  }
+  els["retry-miss-btn"].onclick = ()=>{
+    let pool = misses.map(m=>m.idx);
+    if(currentShuffle) pool = shuffleArr(pool);
+    quizQueue = pool;
+    quizPos = 0;
+    quizResults = [];
+    startQuizCard();
+    showScreen("screen-quiz");
+  };
+  showScreen("screen-result");
+}
+
+els["result-home-btn"].addEventListener("click", ()=>{
+  renderHome();
+  showScreen("screen-home");
+});
+
+function escapeHtml(str){
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+(async function init(){
+  await loadStats();
+  renderGlossary();
+})();
+</script>
+</body>
+</html>
