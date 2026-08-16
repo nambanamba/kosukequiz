@@ -723,7 +723,7 @@
       <div class="stat-card"><div class="num" id="stat-weak">-</div><div class="lbl">苦手な問題</div></div>
     </div>
 
-    <div class="section-title">単元をえらぶ</div>
+    <div class="section-title">単元をえらぶ（複数選択できます）</div>
     <div class="choice-grid" id="unit-choices"></div>
 
     <div class="section-title">出題モード（組み合わせOK）</div>
@@ -847,7 +847,7 @@
 
 // ---- state ----
 let stats = {};           // { idx(string): {correct: n, wrong: n} }
-let currentUnit = "ALL";
+let selectedUnits = new Set(["ALL"]); // multi-select: "ALL" or a set of unit names
 let questionCount = "all"; // "all" or a number
 let filterUnmastered = true;  // "正解ずみを除く"
 let filterWeak = false;       // "苦手な問題だけ"
@@ -971,7 +971,8 @@ function loadSettings(){
     const raw = window.localStorage.getItem(SETTINGS_KEY);
     if(!raw) return;
     const s = JSON.parse(raw);
-    if(s.unit) currentUnit = s.unit;
+    if(Array.isArray(s.units) && s.units.length) selectedUnits = new Set(s.units);
+    else if(s.unit) selectedUnits = new Set([s.unit]); // backward compat with old single-select setting
     if(typeof s.filterUnmastered === "boolean") filterUnmastered = s.filterUnmastered;
     if(typeof s.filterWeak === "boolean") filterWeak = s.filterWeak;
     // backward compatibility with the old single-select "mode" setting
@@ -988,7 +989,7 @@ function loadSettings(){
 function saveSettings(){
   try{
     window.localStorage.setItem(SETTINGS_KEY, JSON.stringify({
-      unit: currentUnit,
+      units: Array.from(selectedUnits),
       filterUnmastered: filterUnmastered,
       filterWeak: filterWeak,
       type: currentType,
@@ -1083,7 +1084,14 @@ function makeUnitChoice(key, label, count){
   div.dataset.unit = key;
   div.innerHTML = '<span class="name">'+label+'</span><span class="count">'+count+'問</span>';
   div.addEventListener("click", ()=>{
-    currentUnit = key;
+    if(key === "ALL"){
+      selectedUnits = new Set(["ALL"]);
+    }else{
+      if(selectedUnits.has("ALL")) selectedUnits = new Set();
+      if(selectedUnits.has(key)) selectedUnits.delete(key);
+      else selectedUnits.add(key);
+      if(selectedUnits.size === 0) selectedUnits = new Set(["ALL"]); // never leave it empty
+    }
     refreshUnitSelection();
     refreshStartButton();
     saveSettings();
@@ -1093,7 +1101,7 @@ function makeUnitChoice(key, label, count){
 
 function refreshUnitSelection(){
   document.querySelectorAll("#unit-choices .choice").forEach(el=>{
-    el.classList.toggle("selected", el.dataset.unit === currentUnit);
+    el.classList.toggle("selected", selectedUnits.has(el.dataset.unit));
   });
 }
 
@@ -1105,7 +1113,13 @@ function refreshStartButton(){
 }
 
 function buildPool(){
-  let pool = unitIndices(currentUnit);
+  let pool;
+  if(selectedUnits.has("ALL")){
+    pool = QA_DATA.map((_,i)=>i);
+  }else{
+    pool = [];
+    QA_DATA.forEach((d,i)=>{ if(selectedUnits.has(d.u)) pool.push(i); });
+  }
   if(filterUnmastered){
     pool = pool.filter(i => !isMastered(i));
   }
@@ -1650,7 +1664,7 @@ function escapeHtml(str){
 }
 
 function applySettingsUI(){
-  // mode filter chips (unit chips are handled inside renderHome via currentUnit)
+  // mode filter chips (unit chips are handled inside renderHome via selectedUnits)
   els["mode-unmastered"].classList.toggle("on", filterUnmastered);
   els["mode-weak"].classList.toggle("on", filterWeak);
   // question type chips
