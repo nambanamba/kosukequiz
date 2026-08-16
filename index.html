@@ -275,6 +275,7 @@
     border:1px solid var(--paper-line);
     background:#fff;
     cursor:zoom-in;
+    touch-action:none;
   }
 
   /* ---- image lightbox (pinch/tap to zoom) ---- */
@@ -1730,6 +1731,11 @@ function applySettingsUI(){
     if(e.target === overlay || e.target === stage) close();
   });
 
+  function beginPinchFrom(pts){
+    startDist = dist(pts[0], pts[1]);
+    startScale = scale;
+  }
+
   stage.addEventListener("pointerdown", (e)=>{
     stage.setPointerCapture(e.pointerId);
     pointers[e.pointerId] = e;
@@ -1740,9 +1746,21 @@ function applySettingsUI(){
       startOriginX = originX;
       startOriginY = originY;
     }else if(ids.length === 2){
-      const pts = Object.values(pointers);
-      startDist = dist(pts[0], pts[1]);
-      startScale = scale;
+      beginPinchFrom(Object.values(pointers));
+    }
+  });
+
+  // let a pinch start directly on the small in-quiz thumbnail: the lightbox
+  // opens the instant a second finger touches down, and the pinch continues
+  // seamlessly (no separate "tap to open, then pinch" step needed)
+  els["quiz-img"].addEventListener("pointerdown", (e)=>{
+    if(!els["quiz-img"].src) return;
+    pointers[e.pointerId] = e;
+    const ids = Object.keys(pointers);
+    if(ids.length === 2){
+      if(!overlay.classList.contains("show")) open(els["quiz-img"].src);
+      ids.forEach(id=>{ try{ stage.setPointerCapture(Number(id)); }catch(err){} });
+      beginPinchFrom(Object.values(pointers));
     }
   });
 
