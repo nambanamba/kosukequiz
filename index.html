@@ -1679,6 +1679,7 @@ function applySettingsUI(){
   let startX = 0, startY = 0, startOriginX = 0, startOriginY = 0;
   let pointers = {};
   let lastTap = 0;
+  let everHadTwoTouches = false;
 
   function apply(){
     img.style.transform = "translate("+originX+"px,"+originY+"px) scale("+scale+")";
@@ -1796,9 +1797,18 @@ function applySettingsUI(){
     }
   });
 
-  stage.addEventListener("touchend", ()=>{
+  stage.addEventListener("touchstart", (e)=>{
+    if(e.touches.length >= 2) everHadTwoTouches = true;
+  }, {passive:true});
+
+  stage.addEventListener("touchmove", (e)=>{
+    if(e.touches.length >= 2) everHadTwoTouches = true;
+  }, {passive:true});
+
+  stage.addEventListener("touchend", (e)=>{
+    if(e.touches.length > 0) return; // still fingers down (mid-pinch)
     const now = Date.now();
-    if(now - lastTap < 300){
+    if(!everHadTwoTouches && now - lastTap < 300){
       if(scale > 1){
         reset();
       }else{
@@ -1807,6 +1817,7 @@ function applySettingsUI(){
       }
     }
     lastTap = now;
+    everHadTwoTouches = false;
   });
 
   document.addEventListener("keydown", (e)=>{
