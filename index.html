@@ -1701,6 +1701,20 @@ function applySettingsUI(){
     if(originY < -maxY) originY = -maxY;
   }
 
+  // zoom so that the screen point (fx,fy) stays under the fingers/cursor
+  // instead of the image always growing outward from its top-left corner
+  function zoomAt(fx, fy, nextScale){
+    nextScale = Math.min(maxScale, Math.max(minScale, nextScale));
+    const rect = img.getBoundingClientRect();
+    const localX = (fx - rect.left) / scale;
+    const localY = (fy - rect.top) / scale;
+    originX += (scale - nextScale) * localX;
+    originY += (scale - nextScale) * localY;
+    scale = nextScale;
+    clampOrigin();
+    apply();
+  }
+
   function dist(a, b){
     const dx = a.clientX - b.clientX;
     const dy = a.clientY - b.clientY;
@@ -1772,11 +1786,10 @@ function applySettingsUI(){
       const pts = Object.values(pointers);
       const newDist = dist(pts[0], pts[1]);
       if(startDist > 0){
-        let next = startScale * (newDist / startDist);
-        next = Math.min(maxScale, Math.max(minScale, next));
-        scale = next;
-        clampOrigin();
-        apply();
+        const next = startScale * (newDist / startDist);
+        const midX = (pts[0].clientX + pts[1].clientX) / 2;
+        const midY = (pts[0].clientY + pts[1].clientY) / 2;
+        zoomAt(midX, midY, next);
       }
     }else if(ids.length === 1 && scale > 1){
       const dx = e.clientX - startX;
@@ -1810,8 +1823,7 @@ function applySettingsUI(){
     if(scale > 1){
       reset();
     }else{
-      scale = 2.5;
-      apply();
+      zoomAt(e.clientX, e.clientY, 2.5);
     }
   });
 
@@ -1830,8 +1842,8 @@ function applySettingsUI(){
       if(scale > 1){
         reset();
       }else{
-        scale = 2.5;
-        apply();
+        const t = e.changedTouches[0];
+        zoomAt(t.clientX, t.clientY, 2.5);
       }
     }
     lastTap = now;
