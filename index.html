@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>社会 一問一答 - 夏期講習</title>
+<style>
+  :root{
+    --paper:#f6f2ea;
+    --paper-line:#e3dbc9;
+    --ink:#2c2a24;
+    --ink-soft:#6b6457;
+    --navy:#1f3d3a;
+    --navy-deep:#16302d;
+    --gold:#b8863b;
+    --ok:#3f7d5c;
+    --ok-bg:#e4efe6;
+    --ng:#b5533f;
+    --ng-bg:#f6e6e1;
+    --card-shadow: 0 10px 30px rgba(31,61,58,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      linear-gradient(var(--paper-line) 1px, transparent 1px) 0 0/100% 34px,
+      var(--paper);
+    color:var(--ink);
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:520px;
+    margin:0 auto;
+    padding:18px 16px 40px;
+    min-height:100vh;
+  }
+  header.top{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:18px;
+    padding-bottom:12px;
+    border-bottom:2px solid var(--navy);
+  }
+  header.top .brand{
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    font-size:20px;
+    font-weight:700;
+    color:var(--navy-deep);
+    letter-spacing:.02em;
+  }
+  header.top .brand small{
+    display:block;
+    font-family: sans-serif;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:400;
+    letter-spacing:.08em;
+    margin-top:2px;
+  }
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  /* ---- home screen ---- */
+  .stat-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .stat-card{
+    flex:1;
+    background:#fff;
+    border:1px solid var(--paper-line);
+    border-radius:10px;
+    padding:12px 10px;
+    text-align:center;
+    box-shadow:var(--card-shadow);
+  }
+  .stat-card .num{
+    font-family:"Hiragino Mincho ProN", serif;
+    font-size:26px;
+    font-weight:700;
+    color:var(--navy-deep);
+    line-height:1.1;
+  }
+  .stat-card .lbl{
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+
+  .section-title{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    letter-spacing:.08em;
+    margin:20px 0 8px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .section-title::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--paper-line);
+  }
+
+  .choice-grid{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .choice{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:#fff;
+    border:1.5px solid var(--paper-line);
+    border-radius:10px;
+    padding:13px 15px;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .choice.selected{
+    border-color:var(--navy);
+    background:#eef4f2;
+  }
+  .choice .name{font-size:15px; font-weight:600;}
+  .choice .count{font-size:12px; color:var(--ink-soft);}
+
+  .toggle-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:8px;
+  }
+  .toggle-row .toggle{
+    flex:1 1 auto;
+    min-width:70px;
+  }
+  .mode-hint{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:6px;
+    line-height:1.5;
+    display:none;
+  }
+  .mode-hint.show{display:block;}
+  .toggle{
+    flex:1;
+    text-align:center;
+    padding:11px 6px;
+    border:1.5px solid var(--paper-line);
+    border-radius:10px;
+    background:#fff;
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .toggle.on{
+    border-color:var(--gold);
+    background:#fbf2e2;
+    color:#7a561f;
+  }
+
+  .start-btn{
+    width:100%;
+    margin-top:24px;
+    padding:16px;
+    border:none;
+    border-radius:12px;
+    background:var(--navy-deep);
+    color:#f6f2ea;
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:.05em;
+    cursor:pointer;
+    box-shadow: 0 8px 18px rgba(22,48,45,0.28);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .start-btn:disabled{
+    background:#b7b2a4;
+    box-shadow:none;
+  }
+  .start-btn:active{transform:translateY(1px);}
+
+  .reset-link{
+    display:block;
+    text-align:center;
+    margin-top:16px;
+    font-size:12px;
+    color:var(--ink-soft);
+    text-decoration:underline;
+    cursor:pointer;
+  }
+
+  /* ---- quiz screen ---- */
+  .quiz-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:10px;
+  }
+  .quiz-head .back{
+    font-size:13px;
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .quiz-head .counter{
+    font-size:13px;
+    font-weight:700;
+    color:var(--navy-deep);
+  }
+  .undo-row{
+    text-align:right;
+    margin:-4px 0 10px;
+  }
+  .undo-row span{
+    font-size:12px;
+    color:var(--gold);
+    font-weight:700;
+    text-decoration:underline;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .progress-bar{
+    height:5px;
+    background:var(--paper-line);
+    border-radius:3px;
+    overflow:hidden;
+    margin-bottom:18px;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--gold);
+    width:0%;
+    transition:width .25s;
+  }
+  .unit-tag{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    color:var(--navy-deep);
+    background:#e5ece9;
+    padding:3px 10px;
+    border-radius:100px;
+    margin-bottom:12px;
+    letter-spacing:.03em;
+  }
+  .card{
+    background:#fff;
+    border-radius:16px;
+    box-shadow:var(--card-shadow);
+    padding:26px 22px;
+    min-height:200px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .img-wrap{
+    margin-bottom:16px;
+    text-align:center;
+  }
+  .img-wrap img{
+    max-width:100%;
+    max-height:260px;
+    border-radius:8px;
+    border:1px solid var(--paper-line);
+    background:#fff;
+    cursor:zoom-in;
+  }
+
+  /* ---- image lightbox (pinch/tap to zoom) ---- */
+  .lightbox-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(10,14,13,0.92);
+    z-index:2000;
+    overflow:hidden;
+    touch-action:none;
+  }
+  .lightbox-overlay.show{
+    display:block;
+  }
+  .lightbox-stage{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .lightbox-stage img{
+    max-width:92vw;
+    max-height:92vh;
+    touch-action:none;
+    user-select:none;
+    -webkit-user-select:none;
+    transform-origin:0 0;
+    will-change:transform;
+  }
+  .lightbox-close{
+    position:absolute;
+    top:14px;
+    right:14px;
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.15);
+    color:#f6f2ea;
+    border:none;
+    font-size:20px;
+    line-height:40px;
+    text-align:center;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .lightbox-hint{
+    position:absolute;
+    bottom:16px;
+    left:0;
+    right:0;
+    text-align:center;
+    font-size:12px;
+    color:rgba(246,242,234,0.7);
+    pointer-events:none;
+  }
+  .q-text{
+    font-size:17px;
+    line-height:1.85;
+    font-weight:500;
+  }
+  .a-block{
+    margin-top:18px;
+    padding-top:16px;
+    border-top:1.5px dashed var(--paper-line);
+    display:none;
+  }
+  .a-block.show{display:block;}
+  .a-label{
+    font-size:11px;
+    font-weight:700;
+    color:var(--gold);
+    letter-spacing:.1em;
+    margin-bottom:6px;
+  }
+  .a-text{
+    font-size:17px;
+    line-height:1.8;
+    font-weight:700;
+    color:var(--navy-deep);
+  }
+
+  .reveal-btn{
+    width:100%;
+    margin-top:18px;
+    padding:15px;
+    border:1.5px solid var(--navy-deep);
+    border-radius:12px;
+    background:#fff;
+    color:var(--navy-deep);
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .reveal-btn:active{background:#eef4f2;}
+
+  .judge-row{
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+  }
+  .judge-btn{
+    flex:1;
+    padding:17px 6px;
+    border:none;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+  }
+  .judge-btn.ng{
+    background:var(--ng-bg);
+    color:var(--ng);
+    border:1.5px solid var(--ng);
+  }
+  .judge-btn.ok{
+    background:var(--ok-bg);
+    color:var(--ok);
+    border:1.5px solid var(--ok);
+  }
+  .judge-btn:active{transform:translateY(1px);}
+
+  /* ---- result screen ---- */
+  .result-hero{
+    text-align:center;
+    padding:28px 10px 20px;
+  }
+  .result-hero .big{
+    font-family:"Hiragino Mincho ProN", serif;
+    font-size:44px;
+    font-weight:700;
+    color:var(--navy-deep);
+  }
+  .result-hero .sub{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+  .miss-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-top:14px;
+  }
+  .miss-item{
+    background:#fff;
+    border:1px solid var(--paper-line);
+    border-radius:10px;
+    padding:12px 14px;
+  }
+  .miss-item .q{font-size:13.5px; line-height:1.6;}
+  .miss-item .a{font-size:13.5px; line-height:1.6; color:var(--ok); font-weight:700; margin-top:4px;}
+  .result-actions{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:22px;
+  }
+  .btn-secondary{
+    width:100%;
+    padding:14px;
+    border:1.5px solid var(--navy-deep);
+    border-radius:12px;
+    background:#fff;
+    color:var(--navy-deep);
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+  }
+
+  .empty-note{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:13px;
+    padding:20px 10px;
+  }
+
+  .list-select{
+    flex:1 1 auto;
+    min-width:0;
+    padding:10px 8px;
+    border:1.5px solid var(--paper-line);
+    border-radius:10px;
+    background:#fff;
+    font-size:13px;
+    color:var(--ink);
+    -webkit-appearance:none;
+    appearance:none;
+  }
+  .list-items{
+    margin-top:14px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .list-item{
+    background:#fff;
+    border:1px solid var(--paper-line);
+    border-radius:12px;
+    padding:12px 14px;
+    box-shadow:var(--card-shadow);
+  }
+  .list-item .list-unit-tag{
+    display:inline-block;
+    font-size:10px;
+    font-weight:700;
+    color:var(--navy-deep);
+    background:#e5ece9;
+    padding:2px 8px;
+    border-radius:100px;
+    margin-bottom:6px;
+  }
+  .list-item .list-q{
+    font-size:13.5px;
+    line-height:1.6;
+    margin-bottom:4px;
+  }
+  .list-item .list-a{
+    font-size:12.5px;
+    line-height:1.6;
+    color:var(--ink-soft);
+    margin-bottom:10px;
+  }
+  .status-toggle{
+    display:flex;
+    gap:6px;
+  }
+  .status-btn{
+    flex:1;
+    padding:8px 4px;
+    border-radius:8px;
+    font-size:12px;
+    font-weight:700;
+    text-align:center;
+    cursor:pointer;
+    border:1.5px solid var(--paper-line);
+    color:var(--ink-soft);
+    background:#fff;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .status-btn.active.unseen{
+    border-color:var(--ink-soft);
+    background:#f0eee7;
+    color:var(--ink);
+  }
+  .status-btn.active.ok{
+    border-color:var(--ok);
+    background:var(--ok-bg);
+    color:var(--ok);
+  }
+  .status-btn.active.ng{
+    border-color:var(--ng);
+    background:var(--ng-bg);
+    color:var(--ng);
+  }
+
+  .list-item-footer{
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+  }
+  .edit-link{
+    font-size:11.5px;
+    color:var(--gold);
+    font-weight:700;
+    text-decoration:underline;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .revert-link{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    text-decoration:underline;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .edited-badge{
+    display:inline-block;
+    font-size:10px;
+    font-weight:700;
+    color:var(--gold);
+    background:#fbf2e2;
+    padding:2px 8px;
+    border-radius:100px;
+    margin-left:6px;
+  }
+  .edit-field-label{
+    font-size:11px;
+    font-weight:700;
+    color:var(--ink-soft);
+    margin:8px 0 4px;
+  }
+  .edit-textarea{
+    width:100%;
+    padding:10px;
+    border:1.5px solid var(--paper-line);
+    border-radius:8px;
+    font-size:13.5px;
+    font-family:inherit;
+    line-height:1.6;
+    resize:vertical;
+  }
+  .edit-textarea:focus{
+    outline:none;
+    border-color:var(--navy);
+  }
+  .edit-actions{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+  }
+  .edit-btn{
+    flex:1;
+    text-align:center;
+    padding:10px 6px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .edit-btn.cancel{
+    background:#fff;
+    color:var(--ink-soft);
+    border:1.5px solid var(--paper-line);
+  }
+  .edit-btn.save{
+    background:var(--navy-deep);
+    color:#f6f2ea;
+    border:1.5px solid var(--navy-deep);
+  }
+
+  .modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(22,48,45,0.45);
+    align-items:center;
+    justify-content:center;
+    z-index:1000;
+    padding:24px;
+  }
+  .modal-overlay.show{
+    display:flex;
+  }
+  .modal-box{
+    background:#fff;
+    border-radius:14px;
+    padding:22px 20px;
+    max-width:340px;
+    width:100%;
+    box-shadow:0 20px 50px rgba(0,0,0,0.25);
+  }
+  .modal-message{
+    font-size:14.5px;
+    line-height:1.7;
+    color:var(--ink);
+    white-space:pre-wrap;
+    margin-bottom:18px;
+  }
+  .modal-actions{
+    display:flex;
+    gap:10px;
+  }
+  .modal-btn{
+    flex:1;
+    padding:12px 6px;
+    border-radius:10px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    border:1.5px solid var(--navy-deep);
+  }
+  .modal-btn.ok{
+    background:var(--navy-deep);
+    color:#f6f2ea;
+  }
+  .modal-btn.cancel{
+    background:#fff;
+    color:var(--ink-soft);
+    border-color:var(--paper-line);
+  }
+
+  .login-wrap{
+    max-width:280px;
+    margin:70px auto 0;
+    text-align:center;
+  }
+  .login-label{
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .login-input{
+    width:100%;
+    padding:14px;
+    border:1.5px solid var(--paper-line);
+    border-radius:10px;
+    background:#fff;
+    font-size:16px;
+    letter-spacing:.05em;
+    text-align:center;
+    margin-bottom:14px;
+  }
+  .login-input:focus{
+    outline:none;
+    border-color:var(--navy);
+  }
+  .login-error{
+    color:var(--ng);
+    font-size:13px;
+    margin-top:12px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">社会 一問一答<small>5年上・夏期講習 ①②③</small></div>
+  </header>
+
+  <!-- LOGIN SCREEN -->
+  <section id="screen-login" class="screen active">
+    <div class="login-wrap">
+      <div class="login-label">合言葉を入力してください</div>
+      <input type="password" id="login-input" class="login-input" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button class="start-btn" id="login-btn">入る</button>
+      <div class="login-error" id="login-error" style="display:none;">合言葉がちがいます</div>
+    </div>
+  </section>
+
+  <!-- HOME SCREEN -->
+  <section id="screen-home" class="screen">
+    <div class="stat-row">
+      <div class="stat-card"><div class="num" id="stat-total">-</div><div class="lbl">全問題数</div></div>
+      <div class="stat-card"><div class="num" id="stat-mastered">-</div><div class="lbl">正解済み数</div></div>
+      <div class="stat-card"><div class="num" id="stat-weak">-</div><div class="lbl">苦手な問題</div></div>
+    </div>
+
+    <div class="section-title">単元をえらぶ</div>
+    <div class="choice-grid" id="unit-choices"></div>
+
+    <div class="section-title">出題モード（組み合わせOK）</div>
+    <div class="toggle-row">
+      <div class="toggle on mode-filter" id="mode-unmastered" data-mode="unmastered">正解ずみを除く</div>
+      <div class="toggle mode-filter" id="mode-weak" data-mode="weak">苦手な問題だけ</div>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle on" id="type-all" data-type="all">文章・図をすべて</div>
+      <div class="toggle" id="type-image" data-type="image">図の問題だけ</div>
+      <div class="toggle" id="type-text" data-type="text">文章問題だけ</div>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle" id="shuffle-toggle" data-shuffle="1">ランダム順</div>
+      <div class="toggle on" id="order-toggle" data-shuffle="0">出題順どおり</div>
+    </div>
+    <div class="mode-hint" id="mode-hint"></div>
+
+    <div class="section-title">問題数</div>
+    <div class="toggle-row" id="count-row">
+      <div class="toggle count-choice" data-count="10">10問</div>
+      <div class="toggle count-choice" data-count="20">20問</div>
+      <div class="toggle count-choice" data-count="30">30問</div>
+      <div class="toggle count-choice" data-count="50">50問</div>
+      <div class="toggle count-choice on" data-count="all">全部</div>
+    </div>
+
+    <button class="start-btn" id="start-btn">はじめる</button>
+    <button class="btn-secondary" id="list-btn" style="margin-top:10px;">問題一覧を見る・正解不正解を切りかえる</button>
+    <div class="reset-link" id="export-link">正解・不正解の記録をエクスポート（CSV）</div>
+    <div class="reset-link" id="import-link">CSVから記録をインポートする</div>
+    <input type="file" id="import-file" accept=".csv,text/csv" style="display:none;">
+    <div class="reset-link" id="reset-link">これまでの記録をリセットする</div>
+  </section>
+
+  <!-- LIST SCREEN -->
+  <section id="screen-list" class="screen">
+    <div class="quiz-head">
+      <div class="back" id="list-back">← もどる</div>
+      <div class="counter" id="list-count">0問</div>
+    </div>
+    <div class="toggle-row">
+      <select id="list-unit-select" class="list-select"></select>
+      <select id="list-status-select" class="list-select">
+        <option value="all">すべての状態</option>
+        <option value="weak">苦手</option>
+        <option value="mastered">正解ずみ</option>
+        <option value="unseen">未回答</option>
+      </select>
+    </div>
+    <div class="list-items" id="list-items"></div>
+  </section>
+
+  <!-- QUIZ SCREEN -->
+  <section id="screen-quiz" class="screen">
+    <div class="quiz-head">
+      <div class="back" id="quiz-back">← やめてもどる</div>
+      <div class="counter" id="quiz-counter">1 / 10</div>
+    </div>
+    <div class="undo-row" id="undo-row" style="display:none;">
+      <span id="undo-link">↩ ひとつ前の判定をやり直す</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+
+    <span class="unit-tag" id="quiz-unit-tag"></span>
+    <div class="card">
+      <div class="img-wrap" id="quiz-img-wrap" style="display:none;">
+        <img id="quiz-img" src="" alt="資料" />
+      </div>
+      <div class="q-text" id="quiz-q"></div>
+      <div class="a-block" id="quiz-a-block">
+        <div class="a-label">こたえ</div>
+        <div class="a-text" id="quiz-a"></div>
+      </div>
+    </div>
+
+    <button class="reveal-btn" id="reveal-btn">こたえを見る</button>
+    <div class="judge-row" id="judge-row" style="display:none;">
+      <button class="judge-btn ng" id="judge-ng">✕ まちがえた</button>
+      <button class="judge-btn ok" id="judge-ok">〇 わかった</button>
+    </div>
+  </section>
+
+  <!-- RESULT SCREEN -->
+  <section id="screen-result" class="screen">
+    <div class="result-hero">
+      <div class="big" id="result-score">0 / 0</div>
+      <div class="sub">正解数 / 出題数</div>
+    </div>
+    <div class="section-title" id="miss-title" style="display:none;">まちがえた問題</div>
+    <div class="miss-list" id="miss-list"></div>
+    <div class="empty-note" id="perfect-note" style="display:none;">全問正解です。すばらしい！</div>
+    <div class="result-actions">
+      <button class="start-btn" id="retry-miss-btn">まちがえた問題だけもう一度</button>
+      <button class="btn-secondary" id="result-home-btn">はじめの画面にもどる</button>
+    </div>
+  </section>
+
+</div>
+
+<div class="lightbox-overlay" id="lightbox-overlay">
+  <button class="lightbox-close" id="lightbox-close">×</button>
+  <div class="lightbox-stage" id="lightbox-stage">
+    <img id="lightbox-img" src="" alt="資料（拡大）" />
+  </div>
+  <div class="lightbox-hint">ピンチ／ダブルタップで拡大・縮小</div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-message" id="modal-message"></div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" id="modal-cancel">キャンセル</button>
+      <button class="modal-btn ok" id="modal-ok">OK</button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+
+// ---- state ----
+let stats = {};           // { idx(string): {correct: n, wrong: n} }
+let currentUnit = "ALL";
+let questionCount = "all"; // "all" or a number
+let filterUnmastered = true;  // "正解ずみを除く"
+let filterWeak = false;       // "苦手な問題だけ"
+let currentType = "all";  // all | image | text
+let currentShuffle = false;
+let quizQueue = [];       // array of indices into QA_DATA
+let quizPos = 0;
+let quizResults = [];     // { idx, correct }
+let revealed = false;
+
+const els = {};
+["screen-home","screen-quiz","screen-result","screen-list","screen-login",
+ "login-input","login-btn","login-error",
+ "stat-total","stat-mastered","stat-weak","unit-choices",
+ "mode-hint","mode-unmastered","mode-weak","type-all","type-image","type-text","shuffle-toggle","order-toggle",
+ "start-btn","reset-link","export-link","import-link","import-file",
+ "modal-overlay","modal-message","modal-ok","modal-cancel",
+ "quiz-back","undo-row","undo-link","quiz-counter","progress-fill","quiz-unit-tag",
+ "quiz-q","quiz-a-block","quiz-a","quiz-img-wrap","quiz-img","reveal-btn","judge-row","judge-ng","judge-ok",
+ "lightbox-overlay","lightbox-stage","lightbox-img","lightbox-close",
+ "result-score","miss-title","miss-list","perfect-note","retry-miss-btn","result-home-btn",
+ "list-btn","list-back","list-count","list-unit-select","list-status-select","list-items"
+].forEach(id => els[id] = document.getElementById(id));
+
+function showScreen(name){
+  ["screen-home","screen-quiz","screen-result","screen-list","screen-login"].forEach(id=>{
+    els[id].classList.toggle("active", id === name);
+  });
+  window.scrollTo(0,0);
+}
+
+// ---- login gate (a light, casual gate for a public link -- not real security,
+//      just enough to keep the URL from being obviously readable at a glance.
+//      The passphrase is stored as a SHA-256 hash rather than plain text.) ----
+const AUTH_KEY = "qa_auth_kaki_koushuu_v1";
+const PASSPHRASE_HASH = "817322f2f58b9ed5d1b730e57e7d809c8e4484cd080f185be2cd0d87f45881e3";
+
+async function sha256Hex(text){
+  const data = new TextEncoder().encode(text);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+function isAuthed(){
+  try{ return window.localStorage.getItem(AUTH_KEY) === "1"; }catch(e){ return false; }
+}
+function setAuthed(){
+  try{ window.localStorage.setItem(AUTH_KEY, "1"); }catch(e){}
+}
+async function attemptLogin(){
+  const val = els["login-input"].value.trim();
+  let hash = "";
+  try{
+    hash = await sha256Hex(val);
+  }catch(e){
+    // very old browsers without crypto.subtle: fail closed
+  }
+  if(hash === PASSPHRASE_HASH){
+    setAuthed();
+    els["login-error"].style.display = "none";
+    els["login-input"].value = "";
+    showScreen("screen-home");
+  }else{
+    els["login-error"].style.display = "block";
+    els["login-input"].value = "";
+    els["login-input"].focus();
+  }
+}
+els["login-btn"].addEventListener("click", attemptLogin);
+els["login-input"].addEventListener("keydown", (e)=>{
+  if(e.key === "Enter") attemptLogin();
+});
+
+// ---- custom modal (some in-app browsers, e.g. LINE/Instagram, silently block
+//      the native confirm()/alert(), which makes buttons look unresponsive.
+//      This works everywhere since it's just regular HTML.) ----
+function showModal(message, withCancel){
+  return new Promise(resolve=>{
+    els["modal-message"].textContent = message;
+    els["modal-cancel"].style.display = withCancel ? "block" : "none";
+    els["modal-overlay"].classList.add("show");
+    const finish = (result)=>{
+      els["modal-overlay"].classList.remove("show");
+      els["modal-ok"].onclick = null;
+      els["modal-cancel"].onclick = null;
+      resolve(result);
+    };
+    els["modal-ok"].onclick = ()=>finish(true);
+    els["modal-cancel"].onclick = ()=>finish(false);
+  });
+}
+function showConfirm(message){
+  return showModal(message, true);
+}
+async function showAlert(message){
+  await showModal(message, false);
+}
+
+// ---- storage (uses the phone's own browser storage, so it works fully offline
+//      once this file is saved/opened on the device) ----
+const STORAGE_KEY = "qa_stats_kaki_koushuu_v1";
+async function loadStats(){
+  try{
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    stats = raw ? JSON.parse(raw) : {};
+  }catch(e){
+    stats = {};
+  }
+}
+async function saveStats(){
+  try{
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+  }catch(e){
+    console.error("save failed", e);
+  }
+}
+
+// ---- settings persistence (remembers the last-used filters/options) ----
+const SETTINGS_KEY = "qa_settings_kaki_koushuu_v1";
+function loadSettings(){
+  try{
+    const raw = window.localStorage.getItem(SETTINGS_KEY);
+    if(!raw) return;
+    const s = JSON.parse(raw);
+    if(s.unit) currentUnit = s.unit;
+    if(typeof s.filterUnmastered === "boolean") filterUnmastered = s.filterUnmastered;
+    if(typeof s.filterWeak === "boolean") filterWeak = s.filterWeak;
+    // backward compatibility with the old single-select "mode" setting
+    if(s.mode === "all"){ filterUnmastered = false; filterWeak = false; }
+    else if(s.mode === "unmastered"){ filterUnmastered = true; filterWeak = false; }
+    else if(s.mode === "weak"){ filterUnmastered = false; filterWeak = true; }
+    if(s.type) currentType = s.type;
+    if(typeof s.shuffle === "boolean") currentShuffle = s.shuffle;
+    if(s.count !== undefined) questionCount = s.count;
+  }catch(e){
+    // ignore, keep defaults
+  }
+}
+function saveSettings(){
+  try{
+    window.localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+      unit: currentUnit,
+      filterUnmastered: filterUnmastered,
+      filterWeak: filterWeak,
+      type: currentType,
+      shuffle: currentShuffle,
+      count: questionCount
+    }));
+  }catch(e){
+    console.error("save settings failed", e);
+  }
+}
+
+// ---- question text edits (lets typos in the original data be fixed in-app,
+//      without touching the correct/incorrect records) ----
+const EDITS_KEY = "qa_edits_kaki_koushuu_v1";
+let edits = {}; // { id: {q, a} }
+function loadEdits(){
+  try{
+    const raw = window.localStorage.getItem(EDITS_KEY);
+    edits = raw ? JSON.parse(raw) : {};
+  }catch(e){
+    edits = {};
+  }
+}
+async function saveEdits(){
+  try{
+    window.localStorage.setItem(EDITS_KEY, JSON.stringify(edits));
+  }catch(e){
+    console.error("save edits failed", e);
+  }
+}
+function getQ(idx){
+  const base = QA_DATA[idx];
+  const e = edits[base.id];
+  if(!e) return base;
+  return Object.assign({}, base, e);
+}
+
+function isWeak(idx){
+  const s = stats[QA_DATA[idx].id];
+  if(!s) return false;
+  // 苦手 = まちがえた回数がある、かつ最新の結果がまちがい、もしくは正解より不正解が多い
+  return (s.wrong||0) > 0 && (s.wrong||0) >= (s.correct||0);
+}
+
+function isMastered(idx){
+  // 正解ずみ = 一度でも「わかった」と答えたことがある問題
+  const s = stats[QA_DATA[idx].id];
+  return !!(s && (s.correct||0) > 0);
+}
+
+function getUnits(){
+  const set = [];
+  QA_DATA.forEach(d=>{ if(!set.includes(d.u)) set.push(d.u); });
+  return set;
+}
+
+function unitIndices(unit){
+  const arr = [];
+  QA_DATA.forEach((d,i)=>{ if(unit==="ALL" || d.u===unit) arr.push(i); });
+  return arr;
+}
+
+// ---- home screen rendering ----
+function renderHome(){
+  // top stats
+  const total = QA_DATA.length;
+  let masteredCount = 0, weakCount = 0;
+  QA_DATA.forEach((d,i)=>{
+    if(isMastered(i)) masteredCount++;
+    if(isWeak(i)) weakCount++;
+  });
+  els["stat-total"].textContent = total;
+  els["stat-mastered"].textContent = masteredCount;
+  els["stat-weak"].textContent = weakCount;
+
+  // unit choices
+  const units = getUnits();
+  els["unit-choices"].innerHTML = "";
+  const allChoice = makeUnitChoice("ALL", "全単元", total);
+  els["unit-choices"].appendChild(allChoice);
+  units.forEach(u=>{
+    const cnt = unitIndices(u).length;
+    els["unit-choices"].appendChild(makeUnitChoice(u, u, cnt));
+  });
+  refreshUnitSelection();
+  refreshStartButton();
+}
+
+function makeUnitChoice(key, label, count){
+  const div = document.createElement("div");
+  div.className = "choice";
+  div.dataset.unit = key;
+  div.innerHTML = '<span class="name">'+label+'</span><span class="count">'+count+'問</span>';
+  div.addEventListener("click", ()=>{
+    currentUnit = key;
+    refreshUnitSelection();
+    refreshStartButton();
+    saveSettings();
+  });
+  return div;
+}
+
+function refreshUnitSelection(){
+  document.querySelectorAll("#unit-choices .choice").forEach(el=>{
+    el.classList.toggle("selected", el.dataset.unit === currentUnit);
+  });
+}
+
+function refreshStartButton(){
+  const pool = buildPool();
+  const n = questionCount === "all" ? pool.length : Math.min(questionCount, pool.length);
+  els["start-btn"].disabled = pool.length === 0;
+  els["start-btn"].textContent = pool.length === 0 ? "この条件の問題はありません" : "はじめる（"+n+"問）";
+}
+
+function buildPool(){
+  let pool = unitIndices(currentUnit);
+  if(filterUnmastered){
+    pool = pool.filter(i => !isMastered(i));
+  }
+  if(filterWeak){
+    pool = pool.filter(i => isWeak(i));
+  }
+  if(currentType === "image"){
+    pool = pool.filter(i => !!QA_DATA[i].img);
+  }else if(currentType === "text"){
+    pool = pool.filter(i => !QA_DATA[i].img);
+  }
+  return pool;
+}
+
+// ---- list screen: browse every question and flip its 正解/不正解/未 status by hand ----
+let listUnit = "ALL";
+let listStatus = "all";
+
+function populateListUnitSelect(){
+  const units = getUnits();
+  els["list-unit-select"].innerHTML = "";
+  const optAll = document.createElement("option");
+  optAll.value = "ALL";
+  optAll.textContent = "全単元";
+  els["list-unit-select"].appendChild(optAll);
+  units.forEach(u=>{
+    const opt = document.createElement("option");
+    opt.value = u;
+    opt.textContent = u;
+    els["list-unit-select"].appendChild(opt);
+  });
+  els["list-unit-select"].value = listUnit;
+}
+
+function questionStatus(idx){
+  if(isWeak(idx)) return "weak";
+  if(isMastered(idx)) return "mastered";
+  return "unseen";
+}
+
+function renderListScreen(){
+  populateListUnitSelect();
+  els["list-status-select"].value = listStatus;
+  renderListItems();
+}
+
+let editingId = null;
+
+function renderListItems(){
+  let indices = unitIndices(listUnit);
+  if(listStatus !== "all"){
+    indices = indices.filter(i => questionStatus(i) === listStatus);
+  }
+  els["list-count"].textContent = indices.length+"問";
+  els["list-items"].innerHTML = "";
+  if(indices.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "empty-note";
+    empty.textContent = "この条件の問題はありません。";
+    els["list-items"].appendChild(empty);
+    return;
+  }
+  indices.forEach(i=>{
+    const base = QA_DATA[i];
+    const d = getQ(i);
+    const isEdited = !!edits[base.id];
+    const status = questionStatus(i);
+    const item = document.createElement("div");
+    item.className = "list-item";
+
+    if(editingId === base.id){
+      item.innerHTML =
+        '<div class="list-unit-tag">'+escapeHtml(d.u)+'</div>'+
+        '<div class="edit-field-label">問題文</div>'+
+        '<textarea class="edit-textarea" id="edit-q-input" rows="3"></textarea>'+
+        '<div class="edit-field-label">こたえ</div>'+
+        '<textarea class="edit-textarea" id="edit-a-input" rows="2"></textarea>'+
+        '<div class="edit-actions">'+
+          '<div class="edit-btn cancel" id="edit-cancel-btn">キャンセル</div>'+
+          '<div class="edit-btn save" id="edit-save-btn">保存する</div>'+
+        '</div>';
+      els["list-items"].appendChild(item);
+      const qInput = item.querySelector("#edit-q-input");
+      const aInput = item.querySelector("#edit-a-input");
+      qInput.value = d.q;
+      aInput.value = d.a;
+      item.querySelector("#edit-cancel-btn").addEventListener("click", ()=>{
+        editingId = null;
+        renderListItems();
+      });
+      item.querySelector("#edit-save-btn").addEventListener("click", async ()=>{
+        const newQ = qInput.value.trim();
+        const newA = aInput.value.trim();
+        if(!newQ || !newA){
+          await showAlert("問題文とこたえは空にできません。");
+          return;
+        }
+        if(newQ === base.q && newA === base.a){
+          delete edits[base.id];
+        }else{
+          edits[base.id] = {q: newQ, a: newA};
+        }
+        await saveEdits();
+        editingId = null;
+        renderListItems();
+      });
+      return;
+    }
+
+    item.innerHTML =
+      '<div class="list-unit-tag">'+escapeHtml(d.u)+(isEdited ? '<span class="edited-badge">編集ずみ</span>' : '')+'</div>'+
+      '<div class="list-q">'+escapeHtml(d.q)+'</div>'+
+      '<div class="list-a">こたえ：'+escapeHtml(d.a)+'</div>'+
+      '<div class="status-toggle">'+
+        '<div class="status-btn unseen'+(status==="unseen"?" active":"")+'" data-status="unseen">未</div>'+
+        '<div class="status-btn ok'+(status==="mastered"?" active":"")+'" data-status="mastered">〇 正解</div>'+
+        '<div class="status-btn ng'+(status==="weak"?" active":"")+'" data-status="weak">✕ 不正解</div>'+
+      '</div>'+
+      '<div class="list-item-footer">'+
+        '<span class="edit-link" id="edit-link-'+i+'">✎ 文章を直す</span>'+
+        (isEdited ? '<span class="revert-link" id="revert-link-'+i+'">元にもどす</span>' : '')+
+      '</div>';
+    item.querySelectorAll(".status-btn").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        await setQuestionStatus(d.id, btn.dataset.status);
+        renderListItems();
+      });
+    });
+    item.querySelector("#edit-link-"+i).addEventListener("click", ()=>{
+      editingId = base.id;
+      renderListItems();
+    });
+    const revertLink = item.querySelector("#revert-link-"+i);
+    if(revertLink){
+      revertLink.addEventListener("click", async ()=>{
+        if(await showConfirm("この問題を元の文章にもどしますか？")){
+          delete edits[base.id];
+          await saveEdits();
+          renderListItems();
+        }
+      });
+    }
+    els["list-items"].appendChild(item);
+  });
+}
+
+async function setQuestionStatus(qid, status){
+  if(status === "unseen"){
+    delete stats[qid];
+  }else if(status === "mastered"){
+    stats[qid] = {correct:1, wrong:0};
+  }else if(status === "weak"){
+    stats[qid] = {correct:0, wrong:1};
+  }
+  await saveStats();
+}
+
+els["list-btn"].addEventListener("click", ()=>{
+  listUnit = "ALL";
+  listStatus = "all";
+  renderListScreen();
+  showScreen("screen-list");
+});
+els["list-back"].addEventListener("click", ()=>{
+  renderHome();
+  showScreen("screen-home");
+});
+els["list-unit-select"].addEventListener("change", ()=>{
+  listUnit = els["list-unit-select"].value;
+  renderListItems();
+});
+els["list-status-select"].addEventListener("change", ()=>{
+  listStatus = els["list-status-select"].value;
+  renderListItems();
+});
+
+function updateModeHint(){
+  let hint = "";
+  if(filterUnmastered && filterWeak){
+    hint = "まだ一度も正解しておらず、かつ苦手（まちがえた回数が正解した回数以上）な問題だけを出題します。";
+  }else if(filterUnmastered){
+    hint = "まだ一度も正解していない問題と、新しい問題だけを出題します。すでに正解した問題はスキップされます。";
+  }else if(filterWeak){
+    hint = "まちがえた回数が正解した回数以上の、苦手な問題だけを出題します。";
+  }
+  els["mode-hint"].textContent = hint;
+  els["mode-hint"].classList.toggle("show", !!hint);
+}
+
+document.querySelectorAll(".mode-filter").forEach(el=>{
+  el.addEventListener("click", ()=>{
+    const key = el.dataset.mode === "unmastered" ? "filterUnmastered" : "filterWeak";
+    if(key === "filterUnmastered"){
+      filterUnmastered = !filterUnmastered;
+    }else{
+      filterWeak = !filterWeak;
+    }
+    el.classList.toggle("on", el.dataset.mode === "unmastered" ? filterUnmastered : filterWeak);
+    updateModeHint();
+    refreshStartButton();
+    saveSettings();
+  });
+});
+els["type-all"].addEventListener("click", ()=>{
+  currentType = "all";
+  els["type-all"].classList.add("on");
+  els["type-image"].classList.remove("on");
+  els["type-text"].classList.remove("on");
+  refreshStartButton();
+  saveSettings();
+});
+els["type-image"].addEventListener("click", ()=>{
+  currentType = "image";
+  els["type-image"].classList.add("on");
+  els["type-all"].classList.remove("on");
+  els["type-text"].classList.remove("on");
+  refreshStartButton();
+  saveSettings();
+});
+els["type-text"].addEventListener("click", ()=>{
+  currentType = "text";
+  els["type-text"].classList.add("on");
+  els["type-all"].classList.remove("on");
+  els["type-image"].classList.remove("on");
+  refreshStartButton();
+  saveSettings();
+});
+els["shuffle-toggle"].addEventListener("click", ()=>{
+  currentShuffle = true;
+  els["shuffle-toggle"].classList.add("on");
+  els["order-toggle"].classList.remove("on");
+  saveSettings();
+});
+els["order-toggle"].addEventListener("click", ()=>{
+  currentShuffle = false;
+  els["order-toggle"].classList.add("on");
+  els["shuffle-toggle"].classList.remove("on");
+  saveSettings();
+});
+
+document.querySelectorAll(".count-choice").forEach(el=>{
+  el.addEventListener("click", ()=>{
+    questionCount = el.dataset.count === "all" ? "all" : parseInt(el.dataset.count, 10);
+    document.querySelectorAll(".count-choice").forEach(c=>c.classList.remove("on"));
+    el.classList.add("on");
+    refreshStartButton();
+    saveSettings();
+  });
+});
+
+els["reset-link"].addEventListener("click", async ()=>{
+  if(await showConfirm("これまでの正解・不正解の記録をすべて消します。よろしいですか？")){
+    stats = {};
+    await saveStats();
+    renderHome();
+  }
+});
+
+function csvEscape(v){
+  v = String(v);
+  if(/[",\n\r]/.test(v)){
+    v = '"' + v.replace(/"/g, '""') + '"';
+  }
+  return v;
+}
+
+els["export-link"].addEventListener("click", ()=>{
+  const rows = [["ID","単元","問題","こたえ","正解した回数","まちがえた回数","状態"]];
+  QA_DATA.forEach((base,i)=>{
+    const d = getQ(i);
+    const s = stats[d.id] || {correct:0, wrong:0};
+    const correct = s.correct||0;
+    const wrong = s.wrong||0;
+    let status = "未回答";
+    if(isWeak(i)) status = "苦手";
+    else if(isMastered(i)) status = "正解ずみ";
+    rows.push([d.id, d.u, d.q, d.a, correct, wrong, status]);
+  });
+  const csv = rows.map(r=>r.map(csvEscape).join(",")).join("\r\n");
+  const blob = new Blob(["\uFEFF"+csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const now = new Date();
+  const pad = n => String(n).padStart(2,"0");
+  const stamp = now.getFullYear()+pad(now.getMonth()+1)+pad(now.getDate());
+  a.href = url;
+  a.download = "社会一問一答_記録_"+stamp+".csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+});
+
+// ---- CSV import (lets progress be carried between devices) ----
+function parseCSV(text){
+  if(text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i];
+    if(inQuotes){
+      if(c === '"'){
+        if(text[i+1] === '"'){ field += '"'; i++; }
+        else{ inQuotes = false; }
+      }else{
+        field += c;
+      }
+    }else{
+      if(c === '"'){ inQuotes = true; }
+      else if(c === ','){ row.push(field); field = ""; }
+      else if(c === '\r'){ /* handled by \n */ }
+      else if(c === '\n'){ row.push(field); field = ""; rows.push(row); row = []; }
+      else{ field += c; }
+    }
+  }
+  if(field.length > 0 || row.length > 0){ row.push(field); rows.push(row); }
+  return rows.filter(r => !(r.length === 1 && r[0].trim() === ""));
+}
+
+els["import-link"].addEventListener("click", ()=>{
+  els["import-file"].click();
+});
+
+els["import-file"].addEventListener("change", (e)=>{
+  const file = e.target.files[0];
+  els["import-file"].value = "";
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async (ev)=>{
+    try{
+      const parsed = parseCSV(String(ev.target.result));
+      if(parsed.length < 2){
+        await showAlert("CSVの中身が読み取れませんでした。");
+        return;
+      }
+      const header = parsed[0];
+      const idIdx = header.indexOf("ID");
+      const unitIdx = header.indexOf("単元");
+      const qIdx = header.indexOf("問題");
+      const aIdx = header.indexOf("こたえ");
+      const correctIdx = header.indexOf("正解した回数");
+      const wrongIdx = header.indexOf("まちがえた回数");
+      if(qIdx === -1 || correctIdx === -1 || wrongIdx === -1){
+        await showAlert("このCSVの形式を読み取れませんでした。このアプリからエクスポートしたファイルを選んでください。");
+        return;
+      }
+      const byId = {};
+      const byQuestion = {};
+      QA_DATA.forEach(d=>{
+        byId[d.id] = d;
+        byQuestion[(d.u||"")+"||"+(d.q||"")] = d;
+      });
+      const newStats = {};
+      const newEdits = {};
+      let matched = 0, unmatched = 0, editCount = 0;
+      for(let i=1;i<parsed.length;i++){
+        const row = parsed[i];
+        if(row.length < 2) continue;
+        let d = null;
+        if(idIdx !== -1 && row[idIdx] && byId[row[idIdx]]){
+          d = byId[row[idIdx]];
+        }else if(unitIdx !== -1){
+          d = byQuestion[(row[unitIdx]||"")+"||"+(row[qIdx]||"")];
+        }
+        if(!d){ unmatched++; continue; }
+        const correct = parseInt(row[correctIdx], 10) || 0;
+        const wrong = parseInt(row[wrongIdx], 10) || 0;
+        if(correct > 0 || wrong > 0){
+          newStats[d.id] = {correct, wrong};
+        }
+        if(aIdx !== -1){
+          const rowQ = (row[qIdx] || "").trim();
+          const rowA = (row[aIdx] || "").trim();
+          if(rowQ && rowA && (rowQ !== d.q || rowA !== d.a)){
+            newEdits[d.id] = {q: rowQ, a: rowA};
+            editCount++;
+          }
+        }
+        matched++;
+      }
+      if(matched === 0){
+        await showAlert("一致する問題が見つかりませんでした。このアプリからエクスポートしたCSVを選んでください。");
+        return;
+      }
+      let msg = matched+"問分の記録が見つかりました";
+      if(editCount > 0) msg += "（うち文章の修正が"+editCount+"問）";
+      msg += "。今のこの端末の記録・文章の修正と置きかえて取り込みますか？";
+      if(unmatched > 0) msg += "\n（"+unmatched+"行は問題が一致せず読み飛ばされます）";
+      if(await showConfirm(msg)){
+        stats = newStats;
+        edits = newEdits;
+        await saveStats();
+        await saveEdits();
+        renderHome();
+        await showAlert("取り込みが完了しました。");
+      }
+    }catch(err){
+      console.error(err);
+      await showAlert("CSVの読み込み中にエラーが発生しました。ファイルの形式をご確認ください。");
+    }
+  };
+  reader.readAsText(file, "UTF-8");
+});
+
+function shuffleArr(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+els["start-btn"].addEventListener("click", ()=>{
+  let pool = buildPool();
+  if(pool.length===0) return;
+  if(currentShuffle) pool = shuffleArr(pool);
+  if(questionCount !== "all") pool = pool.slice(0, questionCount);
+  quizQueue = pool;
+  quizPos = 0;
+  quizResults = [];
+  startQuizCard();
+  showScreen("screen-quiz");
+});
+
+// ---- quiz screen ----
+function startQuizCard(){
+  revealed = false;
+  const idx = quizQueue[quizPos];
+  const d = getQ(idx);
+  els["quiz-unit-tag"].textContent = d.u;
+  els["quiz-q"].textContent = d.q;
+  els["quiz-a"].textContent = d.a;
+  if(d.img){
+    els["quiz-img"].src = "images/" + d.img;
+    els["quiz-img-wrap"].style.display = "block";
+  }else{
+    els["quiz-img-wrap"].style.display = "none";
+  }
+  els["quiz-a-block"].classList.remove("show");
+  els["reveal-btn"].style.display = "block";
+  els["judge-row"].style.display = "none";
+  els["quiz-counter"].textContent = (quizPos+1)+" / "+quizQueue.length;
+  els["progress-fill"].style.width = (quizPos/quizQueue.length*100)+"%";
+  els["undo-row"].style.display = quizResults.length > 0 ? "block" : "none";
+}
+
+els["reveal-btn"].addEventListener("click", ()=>{
+  revealed = true;
+  els["quiz-a-block"].classList.add("show");
+  els["reveal-btn"].style.display = "none";
+  els["judge-row"].style.display = "flex";
+});
+
+async function judge(correct){
+  const idx = quizQueue[quizPos];
+  const qid = QA_DATA[idx].id;
+  if(!stats[qid]) stats[qid] = {correct:0, wrong:0};
+  if(correct) stats[qid].correct = (stats[qid].correct||0) + 1;
+  else stats[qid].wrong = (stats[qid].wrong||0) + 1;
+  await saveStats();
+  quizResults.push({idx, correct});
+
+  quizPos++;
+  if(quizPos >= quizQueue.length){
+    finishQuiz();
+  }else{
+    startQuizCard();
+  }
+}
+els["judge-ok"].addEventListener("click", ()=>judge(true));
+els["judge-ng"].addEventListener("click", ()=>judge(false));
+
+async function undoLast(){
+  if(quizResults.length === 0) return;
+  const last = quizResults.pop();
+  const qid = QA_DATA[last.idx].id;
+  if(stats[qid]){
+    if(last.correct){
+      stats[qid].correct = Math.max(0, (stats[qid].correct||0) - 1);
+    }else{
+      stats[qid].wrong = Math.max(0, (stats[qid].wrong||0) - 1);
+    }
+  }
+  await saveStats();
+  quizPos = Math.max(0, quizPos - 1);
+  startQuizCard();
+}
+els["undo-link"].addEventListener("click", undoLast);
+
+els["quiz-back"].addEventListener("click", async ()=>{
+  if(quizResults.length===0 || await showConfirm("とちゅうでやめますか？ここまでの記録は保存されます。")){
+    renderHome();
+    showScreen("screen-home");
+  }
+});
+
+function finishQuiz(){
+  els["progress-fill"].style.width = "100%";
+  const correctCount = quizResults.filter(r=>r.correct).length;
+  els["result-score"].textContent = correctCount+" / "+quizResults.length;
+
+  const misses = quizResults.filter(r=>!r.correct);
+  els["miss-list"].innerHTML = "";
+  if(misses.length===0){
+    els["miss-title"].style.display = "none";
+    els["perfect-note"].style.display = "block";
+    els["retry-miss-btn"].style.display = "none";
+  }else{
+    els["miss-title"].style.display = "block";
+    els["perfect-note"].style.display = "none";
+    els["retry-miss-btn"].style.display = "block";
+    misses.forEach(m=>{
+      const d = getQ(m.idx);
+      const div = document.createElement("div");
+      div.className = "miss-item";
+      div.innerHTML = '<div class="q">'+escapeHtml(d.q)+'</div><div class="a">'+escapeHtml(d.a)+'</div>';
+      els["miss-list"].appendChild(div);
+    });
+  }
+  els["retry-miss-btn"].onclick = ()=>{
+    let pool = misses.map(m=>m.idx);
+    if(currentShuffle) pool = shuffleArr(pool);
+    quizQueue = pool;
+    quizPos = 0;
+    quizResults = [];
+    startQuizCard();
+    showScreen("screen-quiz");
+  };
+  showScreen("screen-result");
+}
+
+els["result-home-btn"].addEventListener("click", ()=>{
+  renderHome();
+  showScreen("screen-home");
+});
+
+function escapeHtml(str){
+  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function applySettingsUI(){
+  // mode filter chips (unit chips are handled inside renderHome via currentUnit)
+  els["mode-unmastered"].classList.toggle("on", filterUnmastered);
+  els["mode-weak"].classList.toggle("on", filterWeak);
+  // question type chips
+  els["type-all"].classList.toggle("on", currentType === "all");
+  els["type-image"].classList.toggle("on", currentType === "image");
+  els["type-text"].classList.toggle("on", currentType === "text");
+  // order chips
+  els["shuffle-toggle"].classList.toggle("on", currentShuffle === true);
+  els["order-toggle"].classList.toggle("on", currentShuffle === false);
+  // question count chips
+  document.querySelectorAll(".count-choice").forEach(el=>{
+    const val = el.dataset.count === "all" ? "all" : parseInt(el.dataset.count, 10);
+    el.classList.toggle("on", val === questionCount);
+  });
+}
+
+// ---- image lightbox (pinch-to-zoom) ----
+(function(){
+  const overlay = els["lightbox-overlay"];
+  const stage = els["lightbox-stage"];
+  const img = els["lightbox-img"];
+  const closeBtn = els["lightbox-close"];
+
+  let scale = 1, minScale = 1, maxScale = 5;
+  let originX = 0, originY = 0; // translation
+  let startDist = 0, startScale = 1;
+  let startX = 0, startY = 0, startOriginX = 0, startOriginY = 0;
+  let pointers = {};
+  let lastTap = 0;
+
+  function apply(){
+    img.style.transform = "translate("+originX+"px,"+originY+"px) scale("+scale+")";
+  }
+
+  function reset(){
+    scale = 1; originX = 0; originY = 0;
+    apply();
+  }
+
+  function clampOrigin(){
+    const stageRect = stage.getBoundingClientRect();
+    const maxX = stageRect.width;
+    const maxY = stageRect.height;
+    if(originX > maxX) originX = maxX;
+    if(originX < -maxX) originX = -maxX;
+    if(originY > maxY) originY = maxY;
+    if(originY < -maxY) originY = -maxY;
+  }
+
+  function dist(a, b){
+    const dx = a.clientX - b.clientX;
+    const dy = a.clientY - b.clientY;
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+
+  function open(src){
+    img.src = src;
+    reset();
+    overlay.classList.add("show");
+    document.body.style.overflow = "hidden";
+  }
+
+  function close(){
+    overlay.classList.remove("show");
+    document.body.style.overflow = "";
+    img.src = "";
+    pointers = {};
+  }
+
+  els["quiz-img"].addEventListener("click", ()=>{
+    if(els["quiz-img"].src) open(els["quiz-img"].src);
+  });
+
+  closeBtn.addEventListener("click", close);
+
+  overlay.addEventListener("click", (e)=>{
+    if(e.target === overlay || e.target === stage) close();
+  });
+
+  stage.addEventListener("pointerdown", (e)=>{
+    stage.setPointerCapture(e.pointerId);
+    pointers[e.pointerId] = e;
+    const ids = Object.keys(pointers);
+    if(ids.length === 1){
+      startX = e.clientX;
+      startY = e.clientY;
+      startOriginX = originX;
+      startOriginY = originY;
+    }else if(ids.length === 2){
+      const pts = Object.values(pointers);
+      startDist = dist(pts[0], pts[1]);
+      startScale = scale;
+    }
+  });
+
+  stage.addEventListener("pointermove", (e)=>{
+    if(!pointers[e.pointerId]) return;
+    pointers[e.pointerId] = e;
+    const ids = Object.keys(pointers);
+    if(ids.length === 2){
+      const pts = Object.values(pointers);
+      const newDist = dist(pts[0], pts[1]);
+      if(startDist > 0){
+        let next = startScale * (newDist / startDist);
+        next = Math.min(maxScale, Math.max(minScale, next));
+        scale = next;
+        clampOrigin();
+        apply();
+      }
+    }else if(ids.length === 1 && scale > 1){
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      originX = startOriginX + dx;
+      originY = startOriginY + dy;
+      clampOrigin();
+      apply();
+    }
+  });
+
+  function endPointer(e){
+    delete pointers[e.pointerId];
+    const ids = Object.keys(pointers);
+    if(ids.length === 1){
+      const p = Object.values(pointers)[0];
+      startX = p.clientX;
+      startY = p.clientY;
+      startOriginX = originX;
+      startOriginY = originY;
+    }
+    if(ids.length === 0){
+      startDist = 0;
+    }
+  }
+
+  stage.addEventListener("pointerup", endPointer);
+  stage.addEventListener("pointercancel", endPointer);
+
+  stage.addEventListener("dblclick", (e)=>{
+    if(scale > 1){
+      reset();
+    }else{
+      scale = 2.5;
+      apply();
+    }
+  });
+
+  stage.addEventListener("touchend", ()=>{
+    const now = Date.now();
+    if(now - lastTap < 300){
+      if(scale > 1){
+        reset();
+      }else{
+        scale = 2.5;
+        apply();
+      }
+    }
+    lastTap = now;
+  });
+
+  document.addEventListener("keydown", (e)=>{
+    if(e.key === "Escape" && overlay.classList.contains("show")) close();
+  });
+})();
+
+// ---- init ----
+(async function init(){
+  await loadStats();
+  loadEdits();
+  loadSettings();
+  applySettingsUI();
+  updateModeHint();
+  renderHome();
+  if(isAuthed()){
+    showScreen("screen-home");
+  }else{
+    showScreen("screen-login");
+    setTimeout(()=>els["login-input"].focus(), 100);
+  }
+})();
+</script>
+</body>
+</html>
