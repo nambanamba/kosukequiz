@@ -1121,7 +1121,9 @@ function buildPool(){
     QA_DATA.forEach((d,i)=>{ if(selectedUnits.has(d.u)) pool.push(i); });
   }
   if(filterUnmastered){
-    pool = pool.filter(i => !isMastered(i));
+    // a question that's currently 苦手(weak) should never be hidden just
+    // because it happened to be answered correctly once in the past
+    pool = pool.filter(i => !isMastered(i) || isWeak(i));
   }
   if(filterWeak){
     pool = pool.filter(i => isWeak(i));
