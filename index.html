@@ -539,6 +539,57 @@
     color:var(--ng);
   }
 
+  .count-row{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
+  }
+  .count-stepper{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border:1.5px solid var(--paper-line);
+    border-radius:8px;
+    padding:6px 8px;
+  }
+  .count-stepper .count-label{
+    font-size:11px;
+    font-weight:700;
+    color:var(--ink-soft);
+  }
+  .count-stepper.ok .count-label{color:var(--ok);}
+  .count-stepper.ng .count-label{color:var(--ng);}
+  .count-stepper .count-controls{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .count-stepper .count-num{
+    min-width:1.4em;
+    text-align:center;
+    font-size:14px;
+    font-weight:700;
+    color:var(--ink);
+  }
+  .count-btn{
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    border:1.5px solid var(--paper-line);
+    background:#fff;
+    color:var(--ink-soft);
+    font-size:15px;
+    font-weight:700;
+    line-height:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .count-btn:active{background:#eef4f2;}
+
   .list-item-footer{
     display:flex;
     justify-content:space-between;
@@ -1229,6 +1280,7 @@ function renderListItems(){
       return;
     }
 
+    const s = stats[base.id] || {correct:0, wrong:0};
     item.innerHTML =
       '<div class="list-unit-tag">'+escapeHtml(d.u)+(isEdited ? '<span class="edited-badge">編集ずみ</span>' : '')+'</div>'+
       '<div class="list-q">'+escapeHtml(d.q)+'</div>'+
@@ -1238,6 +1290,24 @@ function renderListItems(){
         '<div class="status-btn ok'+(status==="mastered"?" active":"")+'" data-status="mastered">〇 正解</div>'+
         '<div class="status-btn ng'+(status==="weak"?" active":"")+'" data-status="weak">✕ 不正解</div>'+
       '</div>'+
+      '<div class="count-row">'+
+        '<div class="count-stepper ok">'+
+          '<span class="count-label">正解数</span>'+
+          '<span class="count-controls">'+
+            '<span class="count-btn" data-field="correct" data-delta="-1">－</span>'+
+            '<span class="count-num">'+(s.correct||0)+'</span>'+
+            '<span class="count-btn" data-field="correct" data-delta="1">＋</span>'+
+          '</span>'+
+        '</div>'+
+        '<div class="count-stepper ng">'+
+          '<span class="count-label">誤答数</span>'+
+          '<span class="count-controls">'+
+            '<span class="count-btn" data-field="wrong" data-delta="-1">－</span>'+
+            '<span class="count-num">'+(s.wrong||0)+'</span>'+
+            '<span class="count-btn" data-field="wrong" data-delta="1">＋</span>'+
+          '</span>'+
+        '</div>'+
+      '</div>'+
       '<div class="list-item-footer">'+
         '<span class="edit-link" id="edit-link-'+i+'">✎ 文章を直す</span>'+
         (isEdited ? '<span class="revert-link" id="revert-link-'+i+'">元にもどす</span>' : '')+
@@ -1245,6 +1315,12 @@ function renderListItems(){
     item.querySelectorAll(".status-btn").forEach(btn=>{
       btn.addEventListener("click", async ()=>{
         await setQuestionStatus(d.id, btn.dataset.status);
+        renderListItems();
+      });
+    });
+    item.querySelectorAll(".count-btn").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        await adjustStat(base.id, btn.dataset.field, parseInt(btn.dataset.delta, 10));
         renderListItems();
       });
     });
@@ -1264,6 +1340,17 @@ function renderListItems(){
     }
     els["list-items"].appendChild(item);
   });
+}
+
+async function adjustStat(qid, field, delta){
+  const s = stats[qid] || {correct:0, wrong:0};
+  s[field] = Math.max(0, (s[field]||0) + delta);
+  if(s.correct === 0 && s.wrong === 0){
+    delete stats[qid];
+  }else{
+    stats[qid] = s;
+  }
+  await saveStats();
 }
 
 async function setQuestionStatus(qid, status){
