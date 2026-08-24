@@ -803,6 +803,7 @@
     </div>
 
     <button class="start-btn" id="start-btn">はじめる</button>
+    <button class="btn-secondary" id="retry-last-miss-btn" style="margin-top:10px; display:none;">前回まちがえた問題だけやり直す</button>
     <button class="btn-secondary" id="list-btn" style="margin-top:10px;">問題一覧を見る・正解不正解を切りかえる</button>
     <div class="reset-link" id="export-link">正解・不正解の記録をエクスポート（CSV）</div>
     <div class="reset-link" id="import-link">CSVから記録をインポートする</div>
@@ -920,7 +921,7 @@ const els = {};
  "quiz-q","quiz-a-block","quiz-a","quiz-img-wrap","quiz-img","reveal-btn","judge-row","judge-ng","judge-ok",
  "lightbox-overlay","lightbox-stage","lightbox-img","lightbox-close",
  "result-score","miss-title","miss-list","perfect-note","retry-miss-btn","result-home-btn",
- "list-btn","list-back","list-count","list-unit-select","list-status-select","list-items"
+ "list-btn","list-back","list-count","list-unit-select","list-status-select","list-items","retry-last-miss-btn"
 ].forEach(id => els[id] = document.getElementById(id));
 
 function showScreen(name){
@@ -1071,6 +1072,27 @@ async function saveEdits(){
     console.error("save edits failed", e);
   }
 }
+
+// ---- last quiz round's missed questions (so "まちがえた問題だけやり直す" survives
+//      closing/reopening the app, not just staying on the result screen) ----
+const LAST_MISS_KEY = "qa_last_miss_kaki_koushuu_v1";
+let lastMissIds = [];
+function loadLastMiss(){
+  try{
+    const raw = window.localStorage.getItem(LAST_MISS_KEY);
+    lastMissIds = raw ? JSON.parse(raw) : [];
+  }catch(e){
+    lastMissIds = [];
+  }
+}
+function saveLastMiss(ids){
+  lastMissIds = ids;
+  try{
+    window.localStorage.setItem(LAST_MISS_KEY, JSON.stringify(ids));
+  }catch(e){
+    console.error("save last-miss failed", e);
+  }
+}
 function getQ(idx){
   const base = QA_DATA[idx];
   const e = edits[base.id];
@@ -1127,6 +1149,18 @@ function renderHome(){
   });
   refreshUnitSelection();
   refreshStartButton();
+  refreshLastMissButton();
+}
+
+function refreshLastMissButton(){
+  const validIds = lastMissIds.filter(id => QA_DATA.some(d => d.id === id));
+  if(validIds.length !== lastMissIds.length) saveLastMiss(validIds); // data changed since; drop stale ids
+  if(validIds.length > 0){
+    els["retry-last-miss-btn"].style.display = "block";
+    els["retry-last-miss-btn"].textContent = "前回まちがえた問題だけやり直す（"+validIds.length+"問）";
+  }else{
+    els["retry-last-miss-btn"].style.display = "none";
+  }
 }
 
 function makeUnitChoice(key, label, count){
@@ -1712,6 +1746,7 @@ function finishQuiz(){
   els["result-score"].textContent = correctCount+" / "+quizResults.length;
 
   const misses = quizResults.filter(r=>!r.correct);
+  saveLastMiss(misses.map(m=>QA_DATA[m.idx].id));
   els["miss-list"].innerHTML = "";
   if(misses.length===0){
     els["miss-title"].style.display = "none";
@@ -1744,6 +1779,17 @@ function finishQuiz(){
 els["result-home-btn"].addEventListener("click", ()=>{
   renderHome();
   showScreen("screen-home");
+});
+
+els["retry-last-miss-btn"].addEventListener("click", ()=>{
+  let pool = lastMissIds.map(id => QA_DATA.findIndex(d => d.id === id)).filter(i => i !== -1);
+  if(pool.length === 0) return;
+  if(currentShuffle) pool = shuffleArr(pool);
+  quizQueue = pool;
+  quizPos = 0;
+  quizResults = [];
+  startQuizCard();
+  showScreen("screen-quiz");
 });
 
 function escapeHtml(str){
@@ -1961,6 +2007,7 @@ function applySettingsUI(){
   await loadStats();
   loadEdits();
   loadSettings();
+  loadLastMiss();
   applySettingsUI();
   updateModeHint();
   renderHome();
