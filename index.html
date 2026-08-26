@@ -922,7 +922,7 @@
 
 // ---- state ----
 let stats = {};           // { idx(string): {correct: n, wrong: n} }
-let selectedUnits = new Set(["ALL"]); // multi-select: "ALL" or a set of unit names
+let selectedUnits = new Set(getUnits()); // checkbox-style multi-select; starts with every unit selected
 let questionCount = "all"; // "all" or a number
 let filterUnmastered = true;  // "正解ずみを除く"
 let filterWeak = false;       // "苦手な問題だけ"
@@ -1049,8 +1049,12 @@ function loadSettings(){
     const raw = window.localStorage.getItem(SETTINGS_KEY);
     if(!raw) return;
     const s = JSON.parse(raw);
-    if(Array.isArray(s.units) && s.units.length) selectedUnits = new Set(s.units);
-    else if(s.unit) selectedUnits = new Set([s.unit]); // backward compat with old single-select setting
+    if(Array.isArray(s.units) && s.units.length){
+      // "ALL" was a former sentinel value meaning "every unit"; translate it
+      selectedUnits = s.units.includes("ALL") ? new Set(getUnits()) : new Set(s.units);
+    }else if(s.unit){
+      selectedUnits = (s.unit === "ALL") ? new Set(getUnits()) : new Set([s.unit]); // backward compat with old single-select setting
+    }
     if(typeof s.filterUnmastered === "boolean") filterUnmastered = s.filterUnmastered;
     if(typeof s.filterWeak === "boolean") filterWeak = s.filterWeak;
     // backward compatibility with the old single-select "mode" setting
@@ -1155,14 +1159,16 @@ function unitIndices(unit){
 
 // ---- home screen rendering ----
 function renderHome(){
-  // top stats
+  // top stats: reflect only the currently selected units
   const total = QA_DATA.length;
-  let masteredCount = 0, weakCount = 0;
+  let selectedTotal = 0, masteredCount = 0, weakCount = 0;
   QA_DATA.forEach((d,i)=>{
+    if(!selectedUnits.has(d.u)) return;
+    selectedTotal++;
     if(isMastered(i)) masteredCount++;
     if(isWeak(i)) weakCount++;
   });
-  els["stat-total"].textContent = total;
+  els["stat-total"].textContent = selectedTotal;
   els["stat-mastered"].textContent = masteredCount;
   els["stat-weak"].textContent = weakCount;
 
@@ -1197,24 +1203,28 @@ function makeUnitChoice(key, label, count){
   div.dataset.unit = key;
   div.innerHTML = '<span class="name">'+label+'</span><span class="count">'+count+'問</span>';
   div.addEventListener("click", ()=>{
+    const allUnits = getUnits();
     if(key === "ALL"){
-      selectedUnits = new Set(["ALL"]);
+      // master checkbox: select all, or (if everything's already selected) clear all
+      selectedUnits = (selectedUnits.size === allUnits.length) ? new Set() : new Set(allUnits);
     }else{
-      if(selectedUnits.has("ALL")) selectedUnits = new Set();
       if(selectedUnits.has(key)) selectedUnits.delete(key);
       else selectedUnits.add(key);
-      if(selectedUnits.size === 0) selectedUnits = new Set(["ALL"]); // never leave it empty
     }
-    refreshUnitSelection();
-    refreshStartButton();
     saveSettings();
+    renderHome();
   });
   return div;
 }
 
 function refreshUnitSelection(){
+  const allUnits = getUnits();
   document.querySelectorAll("#unit-choices .choice").forEach(el=>{
-    el.classList.toggle("selected", selectedUnits.has(el.dataset.unit));
+    if(el.dataset.unit === "ALL"){
+      el.classList.toggle("selected", selectedUnits.size === allUnits.length);
+    }else{
+      el.classList.toggle("selected", selectedUnits.has(el.dataset.unit));
+    }
   });
 }
 
@@ -1226,13 +1236,8 @@ function refreshStartButton(){
 }
 
 function buildPool(){
-  let pool;
-  if(selectedUnits.has("ALL")){
-    pool = QA_DATA.map((_,i)=>i);
-  }else{
-    pool = [];
-    QA_DATA.forEach((d,i)=>{ if(selectedUnits.has(d.u)) pool.push(i); });
-  }
+  let pool = [];
+  QA_DATA.forEach((d,i)=>{ if(selectedUnits.has(d.u)) pool.push(i); });
   if(filterUnmastered){
     pool = pool.filter(i => !isMastered(i));
   }
