@@ -610,6 +610,16 @@
     cursor:pointer;
     -webkit-tap-highlight-color:transparent;
   }
+  .no-badge{
+    display:inline-block;
+    font-size:10px;
+    font-weight:700;
+    color:var(--ink-soft);
+    background:#eee9de;
+    padding:2px 8px;
+    border-radius:100px;
+    margin-left:6px;
+  }
   .edited-badge{
     display:inline-block;
     font-size:10px;
@@ -1310,7 +1320,7 @@ function renderListItems(){
 
     if(editingId === base.id){
       item.innerHTML =
-        '<div class="list-unit-tag">'+escapeHtml(d.u)+'</div>'+
+        '<div class="list-unit-tag">'+escapeHtml(d.u)+noBadge(base)+'</div>'+
         '<div class="edit-field-label">問題文</div>'+
         '<textarea class="edit-textarea" id="edit-q-input" rows="3"></textarea>'+
         '<div class="edit-field-label">こたえ</div>'+
@@ -1349,7 +1359,7 @@ function renderListItems(){
 
     const s = stats[base.id] || {correct:0, wrong:0};
     item.innerHTML =
-      '<div class="list-unit-tag">'+escapeHtml(d.u)+(isEdited ? '<span class="edited-badge">編集ずみ</span>' : '')+'</div>'+
+      '<div class="list-unit-tag">'+escapeHtml(d.u)+noBadge(base)+(isEdited ? '<span class="edited-badge">編集ずみ</span>' : '')+'</div>'+
       '<div class="list-q">'+escapeHtml(d.q)+'</div>'+
       '<div class="list-a">こたえ：'+escapeHtml(d.a)+'</div>'+
       '<div class="status-toggle">'+
@@ -1711,7 +1721,7 @@ function startQuizCard(){
   revealed = false;
   const idx = quizQueue[quizPos];
   const d = getQ(idx);
-  els["quiz-unit-tag"].textContent = d.u;
+  els["quiz-unit-tag"].innerHTML = escapeHtml(d.u) + noBadge(d);
   els["quiz-q"].textContent = d.q;
   els["quiz-a"].textContent = d.a;
   if(d.img){
@@ -1880,6 +1890,12 @@ els["retry-last-miss-btn"].addEventListener("click", ()=>{
 
 function escapeHtml(str){
   return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+// small badge showing the source JSON's "no", so a question can be quickly
+// pointed to when discussing it with the CSV-authoring session
+function noBadge(base){
+  return base.no ? '<span class="no-badge">No.'+base.no+'</span>' : '';
 }
 
 function applySettingsUI(){
