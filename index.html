@@ -791,6 +791,9 @@
       <div class="toggle" id="shuffle-toggle" data-shuffle="1">ランダム順</div>
       <div class="toggle on" id="order-toggle" data-shuffle="0">出題順どおり</div>
     </div>
+    <div class="toggle-row">
+      <div class="toggle" id="review-mode-toggle">チェックのみ（採点・記録なし）</div>
+    </div>
     <div class="mode-hint" id="mode-hint"></div>
 
     <div class="section-title">問題数</div>
@@ -857,6 +860,7 @@
       <button class="judge-btn ng" id="judge-ng">✕ まちがえた</button>
       <button class="judge-btn ok" id="judge-ok">〇 わかった</button>
     </div>
+    <button class="reveal-btn" id="review-next-btn" style="display:none;">つぎへ</button>
   </section>
 
   <!-- RESULT SCREEN -->
@@ -905,6 +909,7 @@ let filterUnmastered = true;  // "正解ずみを除く"
 let filterWeak = false;       // "苦手な問題だけ"
 let currentType = "all";  // all | image | text
 let currentShuffle = false;
+let reviewMode = false;   // "チェックのみ": just read Q&A, no scoring/recording
 let quizQueue = [];       // array of indices into QA_DATA
 let quizPos = 0;
 let quizResults = [];     // { idx, correct }
@@ -914,11 +919,11 @@ const els = {};
 ["screen-home","screen-quiz","screen-result","screen-list","screen-login",
  "login-input","login-btn","login-error",
  "stat-total","stat-mastered","stat-weak","unit-choices",
- "mode-hint","mode-unmastered","mode-weak","type-all","type-image","type-text","shuffle-toggle","order-toggle",
+ "mode-hint","mode-unmastered","mode-weak","type-all","type-image","type-text","shuffle-toggle","order-toggle","review-mode-toggle",
  "start-btn","reset-link","export-link","import-link","import-file",
  "modal-overlay","modal-message","modal-ok","modal-cancel",
  "quiz-back","undo-row","undo-link","quiz-counter","progress-fill","quiz-unit-tag",
- "quiz-q","quiz-a-block","quiz-a","quiz-img-wrap","quiz-img","reveal-btn","judge-row","judge-ng","judge-ok",
+ "quiz-q","quiz-a-block","quiz-a","quiz-img-wrap","quiz-img","reveal-btn","judge-row","judge-ng","judge-ok","review-next-btn",
  "lightbox-overlay","lightbox-stage","lightbox-img","lightbox-close",
  "result-score","miss-title","miss-list","perfect-note","retry-miss-btn","result-home-btn",
  "list-btn","list-back","list-count","list-unit-select","list-status-select","list-items","retry-last-miss-btn"
@@ -1034,6 +1039,7 @@ function loadSettings(){
     if(s.type) currentType = s.type;
     if(typeof s.shuffle === "boolean") currentShuffle = s.shuffle;
     if(s.count !== undefined) questionCount = s.count;
+    if(typeof s.reviewMode === "boolean") reviewMode = s.reviewMode;
   }catch(e){
     // ignore, keep defaults
   }
@@ -1046,7 +1052,8 @@ function saveSettings(){
       filterWeak: filterWeak,
       type: currentType,
       shuffle: currentShuffle,
-      count: questionCount
+      count: questionCount,
+      reviewMode: reviewMode
     }));
   }catch(e){
     console.error("save settings failed", e);
@@ -1480,6 +1487,11 @@ els["order-toggle"].addEventListener("click", ()=>{
   els["shuffle-toggle"].classList.remove("on");
   saveSettings();
 });
+els["review-mode-toggle"].addEventListener("click", ()=>{
+  reviewMode = !reviewMode;
+  els["review-mode-toggle"].classList.toggle("on", reviewMode);
+  saveSettings();
+});
 
 document.querySelectorAll(".count-choice").forEach(el=>{
   el.addEventListener("click", ()=>{
@@ -1685,17 +1697,37 @@ function startQuizCard(){
   els["quiz-a-block"].classList.remove("show");
   els["reveal-btn"].style.display = "block";
   els["judge-row"].style.display = "none";
+  els["review-next-btn"].style.display = "none";
   els["quiz-counter"].textContent = (quizPos+1)+" / "+quizQueue.length;
   els["progress-fill"].style.width = (quizPos/quizQueue.length*100)+"%";
-  els["undo-row"].style.display = quizResults.length > 0 ? "block" : "none";
+  els["undo-row"].style.display = (!reviewMode && quizResults.length > 0) ? "block" : "none";
 }
 
 els["reveal-btn"].addEventListener("click", ()=>{
   revealed = true;
   els["quiz-a-block"].classList.add("show");
   els["reveal-btn"].style.display = "none";
-  els["judge-row"].style.display = "flex";
+  if(reviewMode){
+    els["review-next-btn"].style.display = "block";
+  }else{
+    els["judge-row"].style.display = "flex";
+  }
 });
+
+els["review-next-btn"].addEventListener("click", ()=>{
+  quizPos++;
+  if(quizPos >= quizQueue.length){
+    finishReview();
+  }else{
+    startQuizCard();
+  }
+});
+
+async function finishReview(){
+  await showAlert("全"+quizQueue.length+"問の確認が終わりました。");
+  renderHome();
+  showScreen("screen-home");
+}
 
 async function judge(correct){
   const idx = quizQueue[quizPos];
@@ -1807,6 +1839,8 @@ function applySettingsUI(){
   // order chips
   els["shuffle-toggle"].classList.toggle("on", currentShuffle === true);
   els["order-toggle"].classList.toggle("on", currentShuffle === false);
+  // review-only mode chip
+  els["review-mode-toggle"].classList.toggle("on", reviewMode === true);
   // question count chips
   document.querySelectorAll(".count-choice").forEach(el=>{
     const val = el.dataset.count === "all" ? "all" : parseInt(el.dataset.count, 10);
