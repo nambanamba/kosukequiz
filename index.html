@@ -855,6 +855,25 @@
       </div>
     </div>
 
+    <div class="count-row" id="quiz-count-row" style="display:none;">
+      <div class="count-stepper ok">
+        <span class="count-label">正解数</span>
+        <span class="count-controls">
+          <span class="count-btn" id="quiz-count-correct-minus" data-field="correct" data-delta="-1">－</span>
+          <span class="count-num" id="quiz-count-correct">0</span>
+          <span class="count-btn" id="quiz-count-correct-plus" data-field="correct" data-delta="1">＋</span>
+        </span>
+      </div>
+      <div class="count-stepper ng">
+        <span class="count-label">誤答数</span>
+        <span class="count-controls">
+          <span class="count-btn" id="quiz-count-wrong-minus" data-field="wrong" data-delta="-1">－</span>
+          <span class="count-num" id="quiz-count-wrong">0</span>
+          <span class="count-btn" id="quiz-count-wrong-plus" data-field="wrong" data-delta="1">＋</span>
+        </span>
+      </div>
+    </div>
+
     <button class="reveal-btn" id="reveal-btn">こたえを見る</button>
     <div class="judge-row" id="judge-row" style="display:none;">
       <button class="judge-btn ng" id="judge-ng">✕ まちがえた</button>
@@ -924,6 +943,8 @@ const els = {};
  "modal-overlay","modal-message","modal-ok","modal-cancel",
  "quiz-back","undo-row","undo-link","quiz-counter","progress-fill","quiz-unit-tag",
  "quiz-q","quiz-a-block","quiz-a","quiz-img-wrap","quiz-img","reveal-btn","judge-row","judge-ng","judge-ok","review-next-btn",
+ "quiz-count-row","quiz-count-correct","quiz-count-wrong",
+ "quiz-count-correct-minus","quiz-count-correct-plus","quiz-count-wrong-minus","quiz-count-wrong-plus",
  "lightbox-overlay","lightbox-stage","lightbox-img","lightbox-close",
  "result-score","miss-title","miss-list","perfect-note","retry-miss-btn","result-home-btn",
  "list-btn","list-back","list-count","list-unit-select","list-status-select","list-items","retry-last-miss-btn"
@@ -1694,13 +1715,32 @@ function startQuizCard(){
   }else{
     els["quiz-img-wrap"].style.display = "none";
   }
-  els["quiz-a-block"].classList.remove("show");
-  els["reveal-btn"].style.display = "block";
-  els["judge-row"].style.display = "none";
-  els["review-next-btn"].style.display = "none";
+  if(reviewMode){
+    // review mode: show the answer right away, no reveal tap needed
+    els["quiz-a-block"].classList.add("show");
+    els["reveal-btn"].style.display = "none";
+    els["judge-row"].style.display = "none";
+    els["review-next-btn"].style.display = "block";
+    els["quiz-count-row"].style.display = "flex";
+    refreshQuizCountRow();
+  }else{
+    els["quiz-a-block"].classList.remove("show");
+    els["reveal-btn"].style.display = "block";
+    els["judge-row"].style.display = "none";
+    els["review-next-btn"].style.display = "none";
+    els["quiz-count-row"].style.display = "none";
+  }
   els["quiz-counter"].textContent = (quizPos+1)+" / "+quizQueue.length;
   els["progress-fill"].style.width = (quizPos/quizQueue.length*100)+"%";
   els["undo-row"].style.display = (!reviewMode && quizResults.length > 0) ? "block" : "none";
+}
+
+function refreshQuizCountRow(){
+  const idx = quizQueue[quizPos];
+  const qid = QA_DATA[idx].id;
+  const s = stats[qid] || {correct:0, wrong:0};
+  els["quiz-count-correct"].textContent = s.correct||0;
+  els["quiz-count-wrong"].textContent = s.wrong||0;
 }
 
 els["reveal-btn"].addEventListener("click", ()=>{
@@ -1721,6 +1761,15 @@ els["review-next-btn"].addEventListener("click", ()=>{
   }else{
     startQuizCard();
   }
+});
+
+document.querySelectorAll("#quiz-count-row .count-btn").forEach(btn=>{
+  btn.addEventListener("click", async ()=>{
+    const idx = quizQueue[quizPos];
+    const qid = QA_DATA[idx].id;
+    await adjustStat(qid, btn.dataset.field, parseInt(btn.dataset.delta, 10));
+    refreshQuizCountRow();
+  });
 });
 
 async function finishReview(){
